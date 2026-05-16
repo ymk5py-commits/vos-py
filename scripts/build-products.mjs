@@ -81,6 +81,7 @@ for (const r of rows) {
   seen.add(id);
 
   const brand = (r[idx('Marca')] || '').trim();
+  const codigo = (r[idx('Codigo')] || '').replace(/["']/g, '').trim();
   const usdRaw = (r[idx('Precio_USD')] || '').trim();
   const gsRaw = (r[idx('Precio_Guaranies')] || '').trim();
   const desc = (r[idx('Descripcion')] || '').trim();
@@ -98,21 +99,30 @@ for (const r of rows) {
   const reviews = Math.floor(20 + seeded(id, 'v') * 900);
   const stock = Math.floor(3 + seeded(id, 's') * 60);
 
+  // Deterministic discount tier: most products none, some 5/10/15%.
+  const dSeed = seeded(id, 'd');
+  const discount = dSeed < 0.55 ? 0 : dSeed < 0.8 ? 5 : dSeed < 0.93 ? 10 : 15;
+  const listGs = discount > 0
+    ? Math.round(priceGs / (1 - discount / 100) / 1000) * 1000
+    : priceGs;
+
   const short = desc.length > 140 ? desc.slice(0, 137).trimEnd() + '…' : desc;
 
   products.push({
     id,
     name: name.replace(/\s+/g, ' '),
     brand: brand || 'Genérico',
+    codigo,
     price: priceUsd,
     priceGs,
+    listGs,
+    discount,
     description: short || `${name} disponible en Vos PY.`,
     fullDescription: desc || `${name} — producto importado disponible en Vos PY, Paraguay.`,
     image: img,
     images: [img],
     category: cat,
     icon,
-    url,
     rating,
     reviews,
     stock,

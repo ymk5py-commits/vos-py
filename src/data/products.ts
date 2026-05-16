@@ -7,15 +7,17 @@ export interface Product {
     id: string;
     name: string;
     brand: string;
+    codigo?: string;
     price: number;        // USD
-    priceGs: number;      // Guaraníes
+    priceGs: number;      // Guaraníes (precio de venta)
+    listGs: number;       // Guaraníes (precio de lista, antes del descuento)
+    discount: number;     // % de descuento (0 si no tiene)
     description: string;
     fullDescription?: string;
     image: string;
     images: string[];
     category: string;
     icon?: string;
-    url?: string;
     rating: number;
     reviews?: number;
     stock?: number;

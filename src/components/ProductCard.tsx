@@ -48,6 +48,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
                     <Badge className="absolute top-2 left-2 bg-[#0038A8]/90 text-white border-none font-bold text-[10px]">
                         {product.brand}
                     </Badge>
+                    {product.discount > 0 && (
+                        <Badge className="absolute top-2 right-2 bg-[#D52B1E] text-white border-none font-bold text-[10px]">
+                            -{product.discount}%
+                        </Badge>
+                    )}
                 </div>
                 <CardContent className="p-3 md:p-4 flex-1">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#D52B1E]">
@@ -62,7 +67,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
                 </CardContent>
                 <CardFooter className="p-3 md:p-4 pt-0 flex flex-col gap-2 md:gap-3">
                     <div className="w-full">
-                        <span className="block text-lg md:text-2xl font-black text-[#0038A8] leading-tight">
+                        {product.discount > 0 && product.listGs > product.priceGs && (
+                            <span className="block text-xs text-zinc-400 line-through leading-none">
+                                {formatGs(product.listGs)}
+                            </span>
+                        )}
+                        <span className={`block text-lg md:text-2xl font-black leading-tight ${product.discount > 0 ? 'text-[#D52B1E]' : 'text-[#0038A8]'}`}>
                             {formatGs(product.priceGs)}
                         </span>
                         {product.price > 0 && (
