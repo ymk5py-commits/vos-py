@@ -1,0 +1,8 @@
+{
+  "name": "Vos PY",
+  "description": "Una plataforma de e-commerce moderna y profesional para Paraguay, inspirada en las mejores tiendas del país.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
