@@ -12,7 +12,8 @@ import { Footer } from './components/Footer';
 import { LoginModal } from './components/LoginModal';
 import { ProductDetail } from './components/ProductDetail';
 import { CartDrawer } from './components/CartDrawer';
-import { loadProducts, Product } from './data/products';
+import { About } from './components/About';
+import { loadProducts, Product, categories } from './data/products';
 import { Button } from './components/ui/button';
 import { motion } from 'motion/react';
 import { Loader2, SearchX } from 'lucide-react';
@@ -34,6 +35,7 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeBrand, setActiveBrand] = useState('all');
   const [search, setSearch] = useState('');
+  const [onlyOffers, setOnlyOffers] = useState(false);
   const [visible, setVisible] = useState(PAGE_SIZE);
 
   const catalogRef = useRef<HTMLDivElement>(null);
@@ -109,26 +111,40 @@ export default function App() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return allProducts.filter((p) => {
+      if (onlyOffers && !(p.discount > 0)) return false;
       if (activeCategory !== 'all' && p.category !== activeCategory) return false;
       if (activeBrand !== 'all' && p.brand !== activeBrand) return false;
       if (q && !`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [allProducts, activeCategory, activeBrand, search]);
+  }, [allProducts, activeCategory, activeBrand, search, onlyOffers]);
 
   useEffect(() => {
     setVisible(PAGE_SIZE);
-  }, [activeCategory, activeBrand, search]);
+  }, [activeCategory, activeBrand, search, onlyOffers]);
 
   const featured = useMemo(() => allProducts.slice(0, 8), [allProducts]);
 
   const scrollToCatalog = () =>
     catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+  const scrollToId = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
   const onSelectCategory = (cat: string) => {
+    setOnlyOffers(false);
     setActiveCategory(cat);
     scrollToCatalog();
   };
+
+  const onShowOffers = () => {
+    setOnlyOffers(true);
+    setActiveCategory('all');
+    scrollToCatalog();
+  };
+
+  const onShowAbout = () => scrollToId('nosotros');
+  const onShowHelp = () => scrollToId('contacto');
 
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-[#0038A8] selection:text-white">
@@ -142,6 +158,11 @@ export default function App() {
           setSearch(v);
           if (v) scrollToCatalog();
         }}
+        categories={categories}
+        onSelectCategory={onSelectCategory}
+        onShowOffers={onShowOffers}
+        onShowAbout={onShowAbout}
+        onShowHelp={onShowHelp}
       />
 
       <main>
@@ -171,7 +192,7 @@ export default function App() {
         )}
 
         {/* Catalog */}
-        <section ref={catalogRef} className="py-16 scroll-mt-20">
+        <section id="catalogo" ref={catalogRef} className="py-16 scroll-mt-24">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
               <motion.div
@@ -180,7 +201,11 @@ export default function App() {
                 viewport={{ once: true }}
               >
                 <h2 className="text-3xl font-bold tracking-tight mb-2">
-                  {activeCategory === 'all' ? 'Catálogo completo' : activeCategory}
+                  {onlyOffers
+                    ? 'Ofertas'
+                    : activeCategory === 'all'
+                      ? 'Catálogo completo'
+                      : activeCategory}
                 </h2>
                 <p className="text-muted-foreground">
                   {loading
@@ -275,6 +300,8 @@ export default function App() {
           </div>
         </section>
 
+        <About />
+
         {/* Trust */}
         <section className="py-20 border-y bg-zinc-50/50">
           <div className="container mx-auto px-4">
@@ -305,7 +332,11 @@ export default function App() {
         </section>
       </main>
 
-      <Footer />
+      <Footer
+        categories={categories}
+        onSelectCategory={onSelectCategory}
+        onShowAbout={onShowAbout}
+      />
 
       <LoginModal
         isOpen={isLoginOpen}

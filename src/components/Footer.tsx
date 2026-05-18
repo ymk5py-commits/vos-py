@@ -8,61 +8,81 @@ import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from 'luci
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
-export const Footer = () => {
+interface FooterProps {
+    categories: { name: string; icon: string }[];
+    onSelectCategory: (cat: string) => void;
+    onShowAbout: () => void;
+}
+
+export const Footer = ({ categories, onSelectCategory, onShowAbout }: FooterProps) => {
     return (
-        <footer className="bg-[#151619] text-white pt-16 pb-8">
+        <footer id="contacto" className="bg-[#151619] text-white pt-16 pb-8 scroll-mt-24">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-12">
                     <div className="space-y-6">
                         <Logo invert />
                         <p className="text-zinc-400 text-sm leading-relaxed">
-                            VOS PY es tu destino premium de compras en Paraguay. 
-                            Ofrecemos lo mejor en electrónica, moda y hogar con garantía oficial.
+                            Vos PY es tu tienda de electrónica importada en Paraguay. Más de
+                            1.700 productos de marcas originales, con garantía oficial, precios
+                            en guaraníes y envíos a todo el país.
                         </p>
-                        <div className="flex gap-4">
-                            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-white/5 hover:bg-white/10">
-                                <Facebook className="h-5 w-5" />
-                            </Button>
-                            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-white/5 hover:bg-white/10">
-                                <Instagram className="h-5 w-5" />
-                            </Button>
-                            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-white/5 hover:bg-white/10">
-                                <Twitter className="h-5 w-5" />
-                            </Button>
-                            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-white/5 hover:bg-white/10">
-                                <Youtube className="h-5 w-5" />
-                            </Button>
+                        <div className="flex gap-3">
+                            {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+                                <Button
+                                    key={i}
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-9 w-9 rounded-full bg-white/5 hover:bg-white/10"
+                                    aria-label="Red social"
+                                >
+                                    <Icon className="h-5 w-5" />
+                                </Button>
+                            ))}
                         </div>
                     </div>
 
                     <div>
                         <h4 className="font-bold mb-6 uppercase tracking-wider text-xs">Categorías</h4>
-                        <ul className="space-y-4 text-sm text-zinc-400">
-                            <li><a href="#" className="hover:text-white transition-colors">Electrónica</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Computadoras</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Audio</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Cámaras</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Hogar</a></li>
+                        <ul className="space-y-3.5 text-sm text-zinc-400">
+                            <li>
+                                <button onClick={() => onSelectCategory('all')} className="hover:text-white transition-colors">
+                                    Ver todo
+                                </button>
+                            </li>
+                            {categories.slice(0, 6).map((c) => (
+                                <li key={c.name}>
+                                    <button
+                                        onClick={() => onSelectCategory(c.name)}
+                                        className="hover:text-white transition-colors text-left"
+                                    >
+                                        {c.name}
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-bold mb-6 uppercase tracking-wider text-xs">Información</h4>
-                        <ul className="space-y-4 text-sm text-zinc-400">
-                            <li><a href="#" className="hover:text-white transition-colors">Sobre Nosotros</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Términos y Condiciones</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Política de Privacidad</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Ventas Corporativas</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Sucursales</a></li>
+                        <ul className="space-y-3.5 text-sm text-zinc-400">
+                            <li>
+                                <button onClick={onShowAbout} className="hover:text-white transition-colors">
+                                    Sobre Nosotros
+                                </button>
+                            </li>
+                            <li><a href="#contacto" className="hover:text-white transition-colors">Términos y Condiciones</a></li>
+                            <li><a href="#contacto" className="hover:text-white transition-colors">Política de Privacidad</a></li>
+                            <li><a href="#contacto" className="hover:text-white transition-colors">Ventas Corporativas</a></li>
+                            <li><a href="#contacto" className="hover:text-white transition-colors">Sucursales</a></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-bold mb-6 uppercase tracking-wider text-xs">Contacto</h4>
-                        <ul className="space-y-4 text-sm text-zinc-400">
+                        <ul className="space-y-3.5 text-sm text-zinc-400">
                             <li className="flex gap-3">
                                 <MapPin className="h-5 w-5 text-[#D52B1E] shrink-0" />
-                                <span>Edificio Vos PY, Asunción, Paraguay</span>
+                                <span>Asunción, Paraguay</span>
                             </li>
                             <li className="flex gap-3">
                                 <Phone className="h-5 w-5 text-[#D52B1E] shrink-0" />
@@ -76,17 +96,17 @@ export const Footer = () => {
                         <div className="mt-8">
                             <h5 className="text-xs font-bold mb-4 uppercase">Suscríbete al Newsletter</h5>
                             <div className="flex gap-2">
-                                <Input 
-                                    className="bg-white/5 border-white/10 focus:border-white/20 text-white" 
-                                    placeholder="tu@email.com" 
+                                <Input
+                                    className="bg-white/5 border-white/10 focus:border-white/20 text-white"
+                                    placeholder="tu@email.com"
                                 />
-                                <Button className="bg-[#D52B1E] hover:bg-[#b02318]">Unirse</Button>
+                                <Button className="bg-[#D52B1E] hover:bg-[#b02318] shrink-0">Unirse</Button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-500">
-                    <p>© 2024 Vos PY Importados. Todos los derechos reservados.</p>
+                    <p>© 2026 Vos PY Importados. Todos los derechos reservados.</p>
                     <div className="flex gap-6">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4 grayscale opacity-50" />
                         <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4 grayscale opacity-50" />
