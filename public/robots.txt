@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /products.json
+
+Sitemap: https://vos-py.vercel.app/sitemap.xml
