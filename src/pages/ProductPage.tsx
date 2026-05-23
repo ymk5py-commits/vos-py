@@ -87,9 +87,11 @@ export default function ProductPage() {
     }
 
     const hasDiscount = product.discount > 0 && product.listGs > product.priceGs;
-    const whatsappHref = `https://wa.me/?text=${encodeURIComponent(
-        `Hola, quiero consultar por: ${safe(product.name)}${product.codigo ? ` (Cód. ${safe(product.codigo, 32)})` : ''} — https://vos-py.vercel.app/producto/${product.id}`
-    )}`;
+    const askPrice = product.priceGs === 0;
+    const waText = askPrice
+        ? `Hola, quería consultar el PRECIO de: ${safe(product.name)}${product.codigo ? ` (Cód. ${safe(product.codigo, 32)})` : ''} — https://vos-py.vercel.app/producto/${product.id}`
+        : `Hola, quiero consultar por: ${safe(product.name)}${product.codigo ? ` (Cód. ${safe(product.codigo, 32)})` : ''} — https://vos-py.vercel.app/producto/${product.id}`;
+    const whatsappHref = `https://wa.me/?text=${encodeURIComponent(waText)}`;
 
     const related = products
         .filter((p) => p.category === product.category && p.id !== product.id)
@@ -145,57 +147,79 @@ export default function ProductPage() {
                         </h1>
 
                         <div className="border-t border-b border-line py-5 mb-6">
-                            <div className="flex items-baseline gap-4 flex-wrap">
-                                <span className={`text-[40px] md:text-[56px] font-bold tabular leading-none tracking-tight ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
-                                    {formatGs(product.priceGs)}
-                                </span>
-                                {hasDiscount && (
-                                    <span className="text-[16px] font-semibold tabular text-ink-3 line-through">{formatGs(product.listGs)}</span>
-                                )}
-                            </div>
-                            <div className="flex gap-5 mt-2 text-[12px] text-ink-3">
-                                {product.price > 0 && (
-                                    <span className="tabular">{formatUsd2(product.price)} TAX FREE *</span>
-                                )}
-                                <span>IVA incluido</span>
-                            </div>
-                        </div>
-
-                        {/* Quantity */}
-                        <div className="flex items-center gap-4 mb-5">
-                            <span className="text-eyebrow text-ink-3">Cantidad</span>
-                            <div className="flex items-center border border-line">
-                                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-10 w-10 flex items-center justify-center hover:bg-paper-2 transition-colors" aria-label="Disminuir cantidad">
-                                    <Minus className="h-4 w-4" strokeWidth={2} />
-                                </button>
-                                <span className="w-10 text-center font-semibold tabular text-[14px]">{qty}</span>
-                                <button onClick={() => setQty((q) => q + 1)} className="h-10 w-10 flex items-center justify-center hover:bg-paper-2 transition-colors" aria-label="Aumentar cantidad">
-                                    <Plus className="h-4 w-4" strokeWidth={2} />
-                                </button>
-                            </div>
-                            {product.stock !== undefined && (
-                                <span className="text-[12px] text-ink-2 tabular">{product.stock} en stock</span>
+                            {askPrice ? (
+                                <>
+                                    <p className="text-eyebrow text-emerald-700 mb-2">Precio a confirmar</p>
+                                    <p className="text-[32px] md:text-[40px] font-bold leading-none tracking-tight text-ink">
+                                        Consultar por WhatsApp
+                                    </p>
+                                    <p className="text-[12px] text-ink-3 mt-2">
+                                        Te respondemos en minutos con precio actualizado, stock y opciones de envío.
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="flex items-baseline gap-4 flex-wrap">
+                                        <span className={`text-[40px] md:text-[56px] font-bold tabular leading-none tracking-tight ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
+                                            {formatGs(product.priceGs)}
+                                        </span>
+                                        {hasDiscount && (
+                                            <span className="text-[16px] font-semibold tabular text-ink-3 line-through">{formatGs(product.listGs)}</span>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-5 mt-2 text-[12px] text-ink-3">
+                                        {product.price > 0 && (
+                                            <span className="tabular">{formatUsd2(product.price)} TAX FREE *</span>
+                                        )}
+                                        <span>IVA incluido</span>
+                                    </div>
+                                </>
                             )}
                         </div>
 
+                        {/* Quantity — solo si hay precio */}
+                        {!askPrice && (
+                            <div className="flex items-center gap-4 mb-5">
+                                <span className="text-eyebrow text-ink-3">Cantidad</span>
+                                <div className="flex items-center border border-line">
+                                    <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-10 w-10 flex items-center justify-center hover:bg-paper-2 transition-colors" aria-label="Disminuir cantidad">
+                                        <Minus className="h-4 w-4" strokeWidth={2} />
+                                    </button>
+                                    <span className="w-10 text-center font-semibold tabular text-[14px]">{qty}</span>
+                                    <button onClick={() => setQty((q) => q + 1)} className="h-10 w-10 flex items-center justify-center hover:bg-paper-2 transition-colors" aria-label="Aumentar cantidad">
+                                        <Plus className="h-4 w-4" strokeWidth={2} />
+                                    </button>
+                                </div>
+                                {product.stock !== undefined && (
+                                    <span className="text-[12px] text-ink-2 tabular">{product.stock} en stock</span>
+                                )}
+                            </div>
+                        )}
+
                         <div className="space-y-3">
-                            <button
-                                onClick={() => addToCart(product, qty)}
-                                className="group w-full inline-flex items-center justify-center gap-3 bg-ink text-paper h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors"
-                                style={{ height: 52 }}
-                            >
-                                <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                                Agregar al carrito
-                            </button>
+                            {!askPrice && (
+                                <button
+                                    onClick={() => addToCart(product, qty)}
+                                    className="group w-full inline-flex items-center justify-center gap-3 bg-ink text-paper h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors"
+                                    style={{ height: 52 }}
+                                >
+                                    <ShoppingCart className="h-4 w-4" strokeWidth={2} />
+                                    Agregar al carrito
+                                </button>
+                            )}
                             <a
                                 href={whatsappHref}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full inline-flex items-center justify-center gap-3 bg-paper border border-ink/15 text-ink h-13 font-semibold text-[14px] hover:bg-paper-2 transition-colors"
+                                className={`w-full inline-flex items-center justify-center gap-3 h-13 font-semibold text-[14px] transition-colors ${
+                                    askPrice
+                                        ? 'bg-emerald-600 text-paper hover:bg-emerald-700'
+                                        : 'bg-paper border border-ink/15 text-ink hover:bg-paper-2'
+                                }`}
                                 style={{ height: 52 }}
                             >
                                 <MessageCircle className="h-4 w-4" strokeWidth={2} />
-                                Consultar por WhatsApp
+                                {askPrice ? 'Pedir precio por WhatsApp' : 'Consultar por WhatsApp'}
                             </a>
                         </div>
 
@@ -267,33 +291,56 @@ export default function ProductPage() {
                 </div>
             </div>
 
-            {/* Mobile sticky add-to-cart bar */}
+            {/* Mobile sticky bar */}
             <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-paper border-t border-line shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.15)]">
                 <div className="px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-3">
                     <div className="flex-1 min-w-0">
-                        {hasDiscount && (
-                            <span className="block text-[11px] line-through tabular text-ink-3 leading-none">{formatGs(product.listGs)}</span>
+                        {askPrice ? (
+                            <>
+                                <p className="text-eyebrow text-emerald-700">Precio</p>
+                                <p className="text-[15px] font-bold text-ink leading-tight">Consultar</p>
+                            </>
+                        ) : (
+                            <>
+                                {hasDiscount && (
+                                    <span className="block text-[11px] line-through tabular text-ink-3 leading-none">{formatGs(product.listGs)}</span>
+                                )}
+                                <p className={`text-[18px] font-bold tabular leading-tight ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
+                                    {formatGs(product.priceGs)}
+                                </p>
+                            </>
                         )}
-                        <p className={`text-[18px] font-bold tabular leading-tight ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
-                            {formatGs(product.priceGs)}
-                        </p>
                     </div>
-                    <a
-                        href={whatsappHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-11 w-11 shrink-0 flex items-center justify-center border-2 border-emerald-500 text-emerald-600"
-                        aria-label="Consultar por WhatsApp"
-                    >
-                        <MessageCircle className="h-4 w-4" strokeWidth={2} />
-                    </a>
-                    <button
-                        onClick={() => addToCart(product, qty)}
-                        className="inline-flex items-center gap-2 bg-ink text-paper px-5 h-11 font-semibold text-[13px] hover:bg-ink/90 transition-colors"
-                    >
-                        <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                        Agregar
-                    </button>
+                    {askPrice ? (
+                        <a
+                            href={whatsappHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-emerald-600 text-paper px-5 h-11 font-semibold text-[13px] hover:bg-emerald-700 transition-colors"
+                        >
+                            <MessageCircle className="h-4 w-4" strokeWidth={2} />
+                            Pedir precio
+                        </a>
+                    ) : (
+                        <>
+                            <a
+                                href={whatsappHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="h-11 w-11 shrink-0 flex items-center justify-center border-2 border-emerald-500 text-emerald-600"
+                                aria-label="Consultar por WhatsApp"
+                            >
+                                <MessageCircle className="h-4 w-4" strokeWidth={2} />
+                            </a>
+                            <button
+                                onClick={() => addToCart(product, qty)}
+                                className="inline-flex items-center gap-2 bg-ink text-paper px-5 h-11 font-semibold text-[13px] hover:bg-ink/90 transition-colors"
+                            >
+                                <ShoppingCart className="h-4 w-4" strokeWidth={2} />
+                                Agregar
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
             <div aria-hidden="true" className="md:hidden h-20" />

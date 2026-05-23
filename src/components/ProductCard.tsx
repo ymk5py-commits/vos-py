@@ -13,7 +13,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ShoppingBag, ImageOff } from 'lucide-react';
+import { ShoppingBag, ImageOff, MessageCircle } from 'lucide-react';
 import { Product, formatGs } from '../data/products';
 
 interface Props {
@@ -33,7 +33,11 @@ const cuotasText = (priceGs: number) => {
 export const ProductCard: React.FC<Props> = ({ product, onAddToCart, dark = false }) => {
     const [imgError, setImgError] = useState(false);
     const hasDiscount = product.discount > 0 && product.listGs > product.priceGs;
-    const cuotas = cuotasText(product.priceGs);
+    const askPrice = product.priceGs === 0;
+    const cuotas = askPrice ? null : cuotasText(product.priceGs);
+    const waHref = askPrice
+        ? `https://wa.me/?text=${encodeURIComponent(`Hola, quería consultar el precio de: ${product.name.replace(/[\r\n<>]/g, '').slice(0, 200)}${product.codigo ? ` (Cód. ${product.codigo})` : ''}`)}`
+        : '';
 
     return (
         <motion.div
@@ -77,33 +81,55 @@ export const ProductCard: React.FC<Props> = ({ product, onAddToCart, dark = fals
                 </Link>
 
                 <div className="mt-auto">
-                    {hasDiscount && (
-                        <span className="block text-[11px] text-ink-3 line-through tabular leading-none">
-                            {formatGs(product.listGs)}
-                        </span>
-                    )}
-                    <p className="text-[18px] md:text-[20px] font-extrabold tabular text-ink leading-tight">
-                        {formatGs(product.priceGs)}
-                    </p>
-                    {cuotas && (
-                        <p className="text-[10px] text-emerald-700 font-semibold tabular mt-0.5">
-                            {cuotas}
-                        </p>
+                    {askPrice ? (
+                        <>
+                            <p className="text-[12px] uppercase tracking-wider font-bold text-emerald-700">Consultar precio</p>
+                            <p className="text-[15px] md:text-[16px] font-extrabold text-ink leading-tight">por WhatsApp</p>
+                        </>
+                    ) : (
+                        <>
+                            {hasDiscount && (
+                                <span className="block text-[11px] text-ink-3 line-through tabular leading-none">
+                                    {formatGs(product.listGs)}
+                                </span>
+                            )}
+                            <p className="text-[18px] md:text-[20px] font-extrabold tabular text-ink leading-tight">
+                                {formatGs(product.priceGs)}
+                            </p>
+                            {cuotas && (
+                                <p className="text-[10px] text-emerald-700 font-semibold tabular mt-0.5">
+                                    {cuotas}
+                                </p>
+                            )}
+                        </>
                     )}
                 </div>
 
-                <button
-                    aria-label={`Agregar ${product.name} al carrito`}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onAddToCart(product);
-                    }}
-                    className="w-full mt-2 h-10 bg-py-red text-paper text-[12px] font-extrabold tracking-wide uppercase hover:bg-py-red-deep transition-colors inline-flex items-center justify-center gap-2"
-                >
-                    <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.4} />
-                    Agregar
-                </button>
+                {askPrice ? (
+                    <a
+                        href={waHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full mt-2 h-10 bg-emerald-600 text-paper text-[12px] font-extrabold tracking-wide uppercase hover:bg-emerald-700 transition-colors inline-flex items-center justify-center gap-2"
+                    >
+                        <MessageCircle className="h-3.5 w-3.5" strokeWidth={2.4} />
+                        Consultar
+                    </a>
+                ) : (
+                    <button
+                        aria-label={`Agregar ${product.name} al carrito`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onAddToCart(product);
+                        }}
+                        className="w-full mt-2 h-10 bg-py-red text-paper text-[12px] font-extrabold tracking-wide uppercase hover:bg-py-red-deep transition-colors inline-flex items-center justify-center gap-2"
+                    >
+                        <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.4} />
+                        Agregar
+                    </button>
+                )}
             </div>
         </motion.div>
     );

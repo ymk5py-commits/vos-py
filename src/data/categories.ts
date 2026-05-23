@@ -37,11 +37,11 @@ export const categories: { name: string; icon: string }[] = [
     "icon": "Laptop"
   },
   {
-    "name": "Juegos y Recreación",
-    "icon": "Gamepad2"
-  },
-  {
     "name": "Hogar y Jardín",
     "icon": "Home"
+  },
+  {
+    "name": "Juegos y Recreación",
+    "icon": "Gamepad2"
   }
 ];
