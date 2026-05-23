@@ -4,10 +4,10 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowUpRight, Truck, ShieldCheck, MessageCircle } from 'lucide-react';
-import { Hero } from '../components/Hero';
+import { HeroCarousel } from '../components/HeroCarousel';
 import { BentoFeatured } from '../components/BentoFeatured';
 import { ProductRail } from '../components/ProductRail';
 import { ProductCard } from '../components/ProductCard';
@@ -18,7 +18,6 @@ const BRANDS = ['Apple', 'Samsung', 'JBL', 'Xiaomi', 'Sony', 'Garmin', 'Motorola
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
-    const nav = useNavigate();
     const { addToCart } = useStore();
 
     useEffect(() => { loadProducts().then(setProducts); }, []);
@@ -28,7 +27,7 @@ export default function Home() {
 
     return (
         <>
-            <Hero onExplore={() => nav('/catalogo')} />
+            <HeroCarousel />
 
             {/* Brand marquee — restrained, single line */}
             <div className="border-y border-line py-5 overflow-hidden bg-paper">
