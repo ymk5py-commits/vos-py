@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Logo } from './Logo';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
-import { Button } from './ui/button';
+import { Logo } from './Logo';
+import { Instagram, MessageCircle, Mail, ArrowUpRight } from 'lucide-react';
 import { Input } from './ui/input';
 
 interface FooterProps {
@@ -15,103 +14,121 @@ interface FooterProps {
     onShowAbout: () => void;
 }
 
-export const Footer = ({ categories, onSelectCategory, onShowAbout }: FooterProps) => {
+export const Footer = ({ categories, onSelectCategory }: FooterProps) => {
     return (
-        <footer id="contacto" className="bg-[#151619] text-white pt-16 pb-8 scroll-mt-24">
-            <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-12">
-                    <div className="space-y-6">
-                        <Logo invert />
-                        <p className="text-zinc-400 text-sm leading-relaxed">
-                            Vos PY es tu tienda de electrónica importada en Paraguay. Más de
-                            1.700 productos de marcas originales, con garantía oficial, precios
-                            en guaraníes y envíos a todo el país.
+        <footer id="contacto" className="border-t border-line bg-paper text-ink scroll-mt-24">
+            <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 pt-20 pb-10">
+                {/* Brand statement */}
+                <div className="grid grid-cols-12 gap-x-6 gap-y-10 mb-16">
+                    <div className="col-span-12 lg:col-span-7">
+                        <h2 className="text-display-m text-ink max-w-xl">
+                            Vos PY<span className="text-py-red">.</span><br />
+                            <span className="text-ink-2 font-bold">Importados, en guaraníes, sin vueltas.</span>
+                        </h2>
+                    </div>
+                    <div className="col-span-12 lg:col-span-5 lg:pl-8 lg:border-l border-line">
+                        <p className="text-eyebrow text-ink-3 mb-3">Newsletter</p>
+                        <p className="text-[14px] text-ink-2 mb-4 max-w-sm">
+                            Una vez por mes: nuevos productos, bajadas de precio y rarezas.
+                            Sin spam.
                         </p>
-                        <div className="flex gap-3">
-                            {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-                                <Button
-                                    key={i}
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-9 w-9 rounded-full bg-white/5 hover:bg-white/10"
-                                    aria-label="Red social"
-                                >
-                                    <Icon className="h-5 w-5" />
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold mb-6 uppercase tracking-wider text-xs">Categorías</h4>
-                        <ul className="space-y-3.5 text-sm text-zinc-400">
-                            <li>
-                                <button onClick={() => onSelectCategory('all')} className="hover:text-white transition-colors">
-                                    Ver todo
-                                </button>
-                            </li>
-                            {categories.slice(0, 6).map((c) => (
-                                <li key={c.name}>
-                                    <button
-                                        onClick={() => onSelectCategory(c.name)}
-                                        className="hover:text-white transition-colors text-left"
-                                    >
-                                        {c.name}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold mb-6 uppercase tracking-wider text-xs">Información</h4>
-                        <ul className="space-y-3.5 text-sm text-zinc-400">
-                            <li><Link to="/nosotros" className="hover:text-white transition-colors">Sobre Nosotros</Link></li>
-                            <li><Link to="/terminos" className="hover:text-white transition-colors">Términos y Condiciones</Link></li>
-                            <li><Link to="/privacidad" className="hover:text-white transition-colors">Política de Privacidad</Link></li>
-                            <li><Link to="/cookies" className="hover:text-white transition-colors">Política de Cookies</Link></li>
-                            <li><Link to="/devoluciones" className="hover:text-white transition-colors">Devoluciones</Link></li>
-                            <li><Link to="/envios" className="hover:text-white transition-colors">Envíos</Link></li>
-                            <li><Link to="/garantia" className="hover:text-white transition-colors">Garantía</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold mb-6 uppercase tracking-wider text-xs">Contacto</h4>
-                        <ul className="space-y-3.5 text-sm text-zinc-400">
-                            <li className="flex gap-3">
-                                <MapPin className="h-5 w-5 text-[#D52B1E] shrink-0" />
-                                <span>Asunción, Paraguay</span>
-                            </li>
-                            <li className="flex gap-3">
-                                <Phone className="h-5 w-5 text-[#D52B1E] shrink-0" />
-                                <span>+595 21 000 000</span>
-                            </li>
-                            <li className="flex gap-3">
-                                <Mail className="h-5 w-5 text-[#D52B1E] shrink-0" />
-                                <span>contacto@vospy.com.py</span>
-                            </li>
-                        </ul>
-                        <div className="mt-8">
-                            <h5 className="text-xs font-bold mb-4 uppercase">Suscríbete al Newsletter</h5>
-                            <div className="flex gap-2">
-                                <Input
-                                    className="bg-white/5 border-white/10 focus:border-white/20 text-white"
-                                    placeholder="tu@email.com"
-                                />
-                                <Button className="bg-[#D52B1E] hover:bg-[#b02318] shrink-0">Unirse</Button>
-                            </div>
-                        </div>
+                        <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
+                            <Input
+                                type="email"
+                                placeholder="tu@email.com"
+                                maxLength={254}
+                                className="h-11 bg-paper-2 border-transparent rounded-full focus-visible:bg-paper focus-visible:border-line focus-visible:ring-0"
+                                aria-label="Tu email"
+                            />
+                            <button
+                                type="submit"
+                                className="h-11 px-5 bg-ink text-paper rounded-full text-[13px] font-semibold hover:bg-ink/90 transition-colors"
+                            >
+                                Suscribirme
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-500">
-                    <p>© 2026 Vos PY Importados. Todos los derechos reservados.</p>
-                    <div className="flex gap-6">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4 grayscale opacity-50" />
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4 grayscale opacity-50" />
+
+                {/* Link columns */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16 border-y border-line py-12">
+                    <Col title="Tienda">
+                        <FootLink onClick={() => onSelectCategory('all')}>Catálogo</FootLink>
+                        {categories.slice(0, 5).map((c) => (
+                            <FootLink key={c.name} onClick={() => onSelectCategory(c.name)}>{c.name}</FootLink>
+                        ))}
+                    </Col>
+                    <Col title="Información">
+                        <FootLink to="/nosotros">Nosotros</FootLink>
+                        <FootLink to="/contacto">Contacto</FootLink>
+                        <FootLink to="/envios">Envíos</FootLink>
+                        <FootLink to="/garantia">Garantía</FootLink>
+                        <FootLink to="/devoluciones">Devoluciones</FootLink>
+                    </Col>
+                    <Col title="Legal">
+                        <FootLink to="/terminos">Términos</FootLink>
+                        <FootLink to="/privacidad">Privacidad</FootLink>
+                        <FootLink to="/cookies">Cookies</FootLink>
+                    </Col>
+                    <Col title="Contacto">
+                        <a
+                            href="https://wa.me/?text=Hola%2C%20quiero%20hacer%20una%20consulta"
+                            target="_blank" rel="noopener noreferrer"
+                            className="block text-[13px] text-ink-2 hover:text-ink py-1 inline-flex items-center gap-1.5"
+                        >
+                            <MessageCircle className="h-3.5 w-3.5" strokeWidth={2} /> WhatsApp
+                        </a>
+                        <a
+                            href="mailto:contacto@vospy.com.py"
+                            className="block text-[13px] text-ink-2 hover:text-ink py-1 inline-flex items-center gap-1.5"
+                        >
+                            <Mail className="h-3.5 w-3.5" strokeWidth={2} /> contacto@vospy.com.py
+                        </a>
+                        <a
+                            href="#"
+                            className="block text-[13px] text-ink-2 hover:text-ink py-1 inline-flex items-center gap-1.5"
+                        >
+                            <Instagram className="h-3.5 w-3.5" strokeWidth={2} /> @vos.py
+                        </a>
+                        <Link to="/.well-known/security.txt" className="block text-[12px] text-ink-3 hover:text-ink py-1 mt-3 inline-flex items-center gap-1">
+                            Reportar vulnerabilidad <ArrowUpRight className="h-3 w-3" />
+                        </Link>
+                    </Col>
+                </div>
+
+                {/* Logo + meta */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <Logo />
+                    <div className="text-[12px] text-ink-3 space-y-1 md:text-right">
+                        <p>© 2026 Vos PY · Asunción, Paraguay</p>
+                        <p className="tabular">Operaciones con factura legal, IVA incluido.</p>
+                        <p>Compromiso con la Ley 1334/98 de Defensa del Consumidor.</p>
                     </div>
                 </div>
             </div>
+
+            {/* Paraguay stripe — only place the flag lives */}
+            <div className="flex h-1.5 w-full" aria-hidden="true">
+                <div className="flex-1 bg-py-red" />
+                <div className="flex-1 bg-paper" />
+                <div className="flex-1 bg-py-blue" />
+            </div>
         </footer>
     );
+};
+
+const Col = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div>
+        <p className="text-eyebrow text-ink-3 mb-4">{title}</p>
+        <div className="flex flex-col">{children}</div>
+    </div>
+);
+
+const FootLink = ({
+    to, onClick, children,
+}: { to?: string; onClick?: () => void; children: React.ReactNode }) => {
+    const cls = 'block text-[13px] text-ink-2 hover:text-ink py-1 text-left';
+    return to
+        ? <Link to={to} className={cls}>{children}</Link>
+        : <button onClick={onClick} className={cls}>{children}</button>;
 };

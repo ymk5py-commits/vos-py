@@ -6,7 +6,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Loader2, SearchX } from 'lucide-react';
-import { motion } from 'motion/react';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/button';
 import { loadProducts, Product } from '../data/products';
@@ -68,92 +67,105 @@ export default function Catalog() {
                 : 'Catálogo completo';
 
     return (
-        <section className="py-12 md:py-16">
-            <div className="container mx-auto px-4">
-                <header className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-                    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-                        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D52B1E]">
-                            Catálogo
-                        </span>
-                        <h1 className="text-3xl md:text-5xl font-black tracking-tight mt-1">{title}</h1>
-                        <p className="text-muted-foreground mt-2">
-                            {loading ? 'Cargando…' : `${filtered.length.toLocaleString('es-PY')} productos disponibles`}
-                        </p>
-                    </motion.div>
-                    <div className="flex flex-wrap gap-3">
-                        <select
-                            value={category}
-                            onChange={(e) => setParam('categoria', e.target.value)}
-                            aria-label="Filtrar por categoría"
-                            className="rounded-full border border-[#0038A8]/20 bg-white px-5 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#0038A8]"
+        <section className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-12 md:py-16">
+            <header className="grid grid-cols-12 gap-x-6 gap-y-6 items-end mb-12 md:mb-16">
+                <div className="col-span-12 lg:col-span-8">
+                    <p className="text-eyebrow text-ink-3 mb-3">Catálogo</p>
+                    <h1 className="text-display-m text-ink">{title}</h1>
+                    <p className="text-ink-2 mt-3 text-[14px]">
+                        {loading
+                            ? 'Cargando…'
+                            : <><span className="tabular font-semibold">{filtered.length.toLocaleString('es-PY')}</span> productos disponibles</>}
+                    </p>
+                </div>
+                <div className="col-span-12 lg:col-span-4 flex flex-wrap gap-2 lg:justify-end">
+                    <select
+                        value={category}
+                        onChange={(e) => setParam('categoria', e.target.value)}
+                        aria-label="Filtrar por categoría"
+                        className="h-10 rounded-full border border-line bg-paper px-4 text-[13px] font-semibold hover:border-ink-3 focus:outline-none focus:ring-2 focus:ring-ink/15 transition-colors"
+                    >
+                        <option value="all">Todas las categorías</option>
+                        {cats.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <select
+                        value={brand}
+                        onChange={(e) => setParam('marca', e.target.value)}
+                        aria-label="Filtrar por marca"
+                        className="h-10 rounded-full border border-line bg-paper px-4 text-[13px] font-semibold hover:border-ink-3 focus:outline-none focus:ring-2 focus:ring-ink/15 transition-colors"
+                    >
+                        <option value="all">Todas las marcas</option>
+                        {brands.map((b) => <option key={b} value={b}>{b}</option>)}
+                    </select>
+                    {onlyOffers && (
+                        <button
+                            onClick={() => setParam('ofertas', null)}
+                            className="h-10 rounded-full border border-sale/40 bg-sale/5 text-sale px-4 text-[13px] font-semibold"
                         >
-                            <option value="all">Todas las categorías</option>
-                            {cats.map((c) => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                        <select
-                            value={brand}
-                            onChange={(e) => setParam('marca', e.target.value)}
-                            aria-label="Filtrar por marca"
-                            className="rounded-full border border-[#0038A8]/20 bg-white px-5 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#0038A8]"
-                        >
-                            <option value="all">Todas las marcas</option>
-                            {brands.map((b) => <option key={b} value={b}>{b}</option>)}
-                        </select>
-                        {onlyOffers && (
-                            <button
-                                onClick={() => setParam('ofertas', null)}
-                                className="rounded-full border border-[#D52B1E]/30 bg-[#D52B1E]/5 text-[#D52B1E] px-4 py-2.5 text-xs font-bold"
-                            >
-                                Solo ofertas ✕
-                            </button>
-                        )}
-                    </div>
-                </header>
+                            Solo ofertas ✕
+                        </button>
+                    )}
+                </div>
+            </header>
 
-                {loading && (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4 text-muted-foreground">
-                        <Loader2 className="h-10 w-10 animate-spin text-[#0038A8]" />
-                        <p className="font-semibold">Cargando catálogo…</p>
-                    </div>
-                )}
-                {err && (
-                    <div className="text-center py-24 bg-red-50 rounded-3xl">
-                        <p className="text-[#D52B1E] font-bold">{err}</p>
-                    </div>
-                )}
-
-                {!loading && !err && (
-                    <>
-                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                            {filtered.slice(0, visible).map((p) => (
-                                <ProductCard key={p.id} product={p} onAddToCart={(prod) => addToCart(prod, 1)} />
-                            ))}
+            {loading && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-14">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <div key={i} className="space-y-4">
+                            <div className="aspect-square bg-paper-2 animate-pulse" />
+                            <div className="h-3 bg-paper-2 animate-pulse w-2/3" />
+                            <div className="h-3 bg-paper-2 animate-pulse w-1/3" />
                         </div>
+                    ))}
+                </div>
+            )}
+            {err && (
+                <div className="text-center py-24 border border-sale/40 bg-sale/5">
+                    <p className="text-sale font-bold">{err}</p>
+                </div>
+            )}
 
-                        {filtered.length === 0 && (
-                            <div className="text-center py-24 bg-muted/20 rounded-3xl flex flex-col items-center gap-4">
-                                <SearchX className="h-12 w-12 text-muted-foreground/40" />
-                                <p className="text-muted-foreground text-lg">No encontramos productos con esos filtros.</p>
-                                <Button variant="outline" className="rounded-full" onClick={() => setParams({}, { replace: true })}>
-                                    Limpiar filtros
-                                </Button>
-                            </div>
-                        )}
+            {!loading && !err && (
+                <>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-14 md:gap-y-20">
+                        {filtered.slice(0, visible).map((p) => (
+                            <ProductCard key={p.id} product={p} onAddToCart={(prod) => addToCart(prod, 1)} />
+                        ))}
+                    </div>
 
-                        {visible < filtered.length && (
-                            <div className="flex justify-center mt-12">
-                                <Button
-                                    size="lg"
-                                    onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                                    className="bg-[#0038A8] hover:bg-[#002b80] text-white rounded-full px-12 h-14 font-bold"
-                                >
-                                    Ver más ({(filtered.length - visible).toLocaleString('es-PY')} restantes)
-                                </Button>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                    {filtered.length === 0 && (
+                        <div className="text-center py-24 border-y border-line flex flex-col items-center gap-4">
+                            <SearchX className="h-10 w-10 text-ink-3" strokeWidth={1.4} />
+                            <p className="text-ink-2 text-lg">No encontramos productos con esos filtros.</p>
+                            <Button
+                                variant="outline"
+                                className="rounded-full border-ink/15 hover:bg-paper-2"
+                                onClick={() => setParams({}, { replace: true })}
+                            >
+                                Limpiar filtros
+                            </Button>
+                        </div>
+                    )}
+
+                    {visible < filtered.length && (
+                        <div className="flex justify-center mt-16">
+                            <button
+                                onClick={() => setVisible((v) => v + PAGE_SIZE)}
+                                className="group inline-flex items-center gap-3 bg-ink text-paper rounded-full pl-7 pr-2 h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors"
+                                style={{ height: 52 }}
+                            >
+                                <span>Ver más</span>
+                                <span className="text-paper/70 tabular">
+                                    {(filtered.length - visible).toLocaleString('es-PY')} restantes
+                                </span>
+                                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-paper text-ink text-[14px] font-bold transition-transform duration-300 group-hover:translate-x-0.5">
+                                    +
+                                </span>
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
         </section>
     );
 }

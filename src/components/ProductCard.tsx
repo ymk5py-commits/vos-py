@@ -5,94 +5,89 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Product, formatGs, formatUsd } from '../data/products';
-import { Card, CardContent, CardFooter } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Plus, ImageOff } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Plus } from 'lucide-react';
+import { Product, formatGs } from '../data/products';
 
-interface ProductCardProps {
+interface Props {
     product: Product;
     onAddToCart: (product: Product) => void;
     dark?: boolean;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, dark = false }) => {
+export const ProductCard: React.FC<Props> = ({ product, onAddToCart, dark = false }) => {
     const [imgError, setImgError] = useState(false);
+    const hasDiscount = product.discount > 0 && product.listGs > product.priceGs;
 
     return (
         <motion.div
-            whileHover={{ y: -4 }}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="h-full group"
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="group"
         >
-            <Link to={`/producto/${product.id}`} className="block h-full">
-                <Card className={`h-full flex flex-col overflow-hidden border ${dark ? 'border-white/10 bg-white/5 hover:bg-white/[0.07]' : 'border-zinc-100 bg-white hover:border-[#0038A8]/20'} shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl`}>
-                    <div className={`relative aspect-square overflow-hidden ${dark ? 'bg-white' : 'bg-white'} p-4`}>
-                        {imgError ? (
-                            <div className="h-full w-full flex flex-col items-center justify-center text-zinc-300 gap-2 bg-zinc-50 rounded-xl">
-                                <ImageOff className="h-10 w-10" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider">Sin imagen</span>
-                            </div>
-                        ) : (
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                loading="lazy"
-                                onError={() => setImgError(true)}
-                                className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
-                            />
-                        )}
-                        <Badge className={`absolute top-3 left-3 ${dark ? 'bg-white/90 text-zinc-950' : 'bg-zinc-950/85 text-white'} border-none font-bold text-[10px] tracking-wider uppercase`}>
-                            {product.brand}
-                        </Badge>
-                        {product.discount > 0 && (
-                            <Badge className="absolute top-3 right-3 bg-[#D52B1E] text-white border-none font-bold text-[10px]">
-                                -{product.discount}%
-                            </Badge>
-                        )}
-                    </div>
-                    <CardContent className="p-4 flex-1">
-                        <span className={`text-[10px] font-bold uppercase tracking-[0.18em] ${dark ? 'text-[#ff6b5e]' : 'text-[#D52B1E]'}`}>
-                            {product.category}
-                        </span>
-                        <h3 className={`font-bold text-sm md:text-[15px] line-clamp-2 mt-1 ${dark ? 'text-white group-hover:text-white/90' : 'text-zinc-900 group-hover:text-[#0038A8]'} transition-colors min-h-[42px] leading-snug`}>
-                            {product.name}
-                        </h3>
-                    </CardContent>
-                    <CardFooter className="p-4 pt-0 flex items-end justify-between gap-3">
-                        <div>
-                            {product.discount > 0 && product.listGs > product.priceGs && (
-                                <span className={`block text-[11px] line-through leading-none ${dark ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                                    {formatGs(product.listGs)}
-                                </span>
-                            )}
-                            <span className={`block text-lg md:text-2xl font-black leading-tight ${product.discount > 0 ? (dark ? 'text-[#ff6b5e]' : 'text-[#D52B1E]') : (dark ? 'text-white' : 'text-[#0038A8]')}`}>
-                                {formatGs(product.priceGs)}
-                            </span>
-                            {product.price > 0 && (
-                                <span className={`text-[10px] font-semibold ${dark ? 'text-zinc-400' : 'text-muted-foreground'}`}>
-                                    {formatUsd(product.price)}
-                                </span>
-                            )}
+            <Link to={`/producto/${product.id}`} className="block">
+                {/* Image plate — bare, no card */}
+                <div className={`relative aspect-square overflow-hidden ${dark ? 'bg-paper' : 'bg-paper-2'} mb-4`}>
+                    {imgError ? (
+                        <div className="absolute inset-0 flex items-center justify-center text-ink-3">
+                            <span className="text-3xl font-bold tracking-tight tabular opacity-30">VP</span>
                         </div>
-                        <Button
-                            size="icon"
-                            aria-label={`Agregar ${product.name} al carrito`}
-                            className={`h-10 w-10 rounded-full shrink-0 ${dark ? 'bg-white text-zinc-950 hover:bg-zinc-200' : 'bg-zinc-950 hover:bg-zinc-800 text-white'} transition-all`}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                onAddToCart(product);
-                            }}
-                        >
-                            <Plus className="h-5 w-5" />
-                        </Button>
-                    </CardFooter>
-                </Card>
+                    ) : (
+                        <img
+                            src={product.image}
+                            alt={product.name}
+                            loading="lazy"
+                            onError={() => setImgError(true)}
+                            className="absolute inset-0 h-full w-full object-contain p-6 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                        />
+                    )}
+
+                    {/* Brand mark, top-left, never bigger than the product needs */}
+                    <span className={`absolute top-3 left-3 text-eyebrow ${dark ? 'text-ink' : 'text-ink-3'}`}>
+                        {product.brand}
+                    </span>
+
+                    {/* Sale signal: solid block, not a rounded badge */}
+                    {hasDiscount && (
+                        <span className="absolute top-0 right-0 bg-sale text-paper text-[11px] font-bold tabular px-2 py-1.5">
+                            −{product.discount}%
+                        </span>
+                    )}
+
+                    {/* Floating quick-add: appears on hover only, square */}
+                    <button
+                        aria-label={`Agregar ${product.name} al carrito`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onAddToCart(product);
+                        }}
+                        className="absolute bottom-3 right-3 h-10 w-10 bg-ink text-paper flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-ink/90"
+                    >
+                        <Plus className="h-4 w-4" strokeWidth={2.4} />
+                    </button>
+                </div>
+
+                {/* Meta row */}
+                <div className="flex items-start justify-between gap-4">
+                    <h3 className={`text-[14px] md:text-[15px] leading-snug font-semibold ${dark ? 'text-paper' : 'text-ink'} line-clamp-2 flex-1`}>
+                        {product.name.toLowerCase().replace(/(^|\s)\S/g, (s) => s.toUpperCase())}
+                    </h3>
+                    <div className="text-right shrink-0">
+                        {hasDiscount && (
+                            <span className={`block text-[11px] line-through leading-none tabular ${dark ? 'text-ink-3' : 'text-ink-3'}`}>
+                                {formatGs(product.listGs)}
+                            </span>
+                        )}
+                        <span className={`block text-[15px] md:text-[17px] font-bold tabular leading-tight ${dark ? 'text-paper' : 'text-ink'} ${hasDiscount ? '!text-sale' : ''}`}>
+                            {formatGs(product.priceGs)}
+                        </span>
+                    </div>
+                </div>
+                <p className={`text-eyebrow mt-1 ${dark ? 'text-ink-3' : 'text-ink-3'}`}>
+                    {product.category}
+                </p>
             </Link>
         </motion.div>
     );

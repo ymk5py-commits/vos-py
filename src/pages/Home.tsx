@@ -6,13 +6,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { ArrowUpRight, Truck, ShieldCheck, MessageCircle } from 'lucide-react';
 import { Hero } from '../components/Hero';
-import { CategoryFilter } from '../components/CategoryFilter';
 import { ProductCard } from '../components/ProductCard';
-import { About } from '../components/About';
 import { loadProducts, Product } from '../data/products';
 import { useStore } from '../store';
-import { ArrowRight, ShieldCheck, Truck, CreditCard } from 'lucide-react';
+
+const BRANDS = ['Apple', 'Samsung', 'JBL', 'Xiaomi', 'Sony', 'Garmin', 'Motorola', 'Huawei', 'Honor', 'Philips', 'Nintendo', 'Pioneer', 'Spigen', 'Mcdodo', 'Aiwa', 'Funko'];
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -21,66 +21,98 @@ export default function Home() {
 
     useEffect(() => { loadProducts().then(setProducts); }, []);
 
-    const featured = products.slice(0, 8);
+    const featured = products.slice(0, 6);
     const offers = products.filter((p) => p.discount > 0).slice(0, 4);
 
     return (
         <>
             <Hero onExplore={() => nav('/catalogo')} />
 
-            {/* Marquee of brands */}
-            <div className="border-y bg-zinc-50 overflow-hidden">
-                <div className="container mx-auto px-4 py-3">
-                    <div className="flex items-center gap-10 text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-500 whitespace-nowrap animate-marquee">
-                        {['Apple', 'Samsung', 'JBL', 'Xiaomi', 'Sony', 'Garmin', 'Motorola', 'Huawei', 'Honor', 'Philips', 'Nintendo', 'Pioneer'].concat(['Apple', 'Samsung', 'JBL', 'Xiaomi', 'Sony', 'Garmin', 'Motorola', 'Huawei']).map((b, i) => (
-                            <span key={i}>{b}</span>
-                        ))}
-                    </div>
+            {/* Marquee — brand wall, restrained */}
+            <div className="border-y border-line py-5 overflow-hidden bg-paper">
+                <div className="animate-marquee text-ink-3 text-[13px] font-semibold tracking-[0.25em] uppercase">
+                    {[...BRANDS, ...BRANDS].map((b, i) => (
+                        <span key={i} className="px-1">{b}</span>
+                    ))}
                 </div>
             </div>
 
-            <CategoryFilter activeCategory="all" onSelect={(c) => nav(c === 'all' ? '/catalogo' : `/catalogo?categoria=${encodeURIComponent(c)}`)} />
-
+            {/* Editor's picks — asymmetric editorial composition */}
             {featured.length > 0 && (
-                <section className="py-16 md:py-20 bg-white">
-                    <div className="container mx-auto px-4">
-                        <div className="flex items-end justify-between mb-10">
-                            <div>
-                                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D52B1E]">Destacados</span>
-                                <h2 className="text-3xl md:text-4xl font-black tracking-tight mt-1">Los más buscados</h2>
-                            </div>
-                            <Link
-                                to="/catalogo"
-                                className="hidden md:flex items-center gap-2 text-sm font-bold text-[#0038A8] hover:gap-3 transition-all"
-                            >
-                                Ver catálogo <ArrowRight className="h-4 w-4" />
-                            </Link>
+                <section className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-28">
+                    <header className="flex items-end justify-between mb-12 gap-6">
+                        <div>
+                            <p className="text-eyebrow text-ink-3 mb-3">Selección de la semana</p>
+                            <h2 className="text-headline text-ink">Lo nuevo en Vos PY</h2>
                         </div>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                            {featured.map((p) => (
-                                <ProductCard key={p.id} product={p} onAddToCart={(prod) => addToCart(prod, 1)} />
-                            ))}
-                        </div>
+                        <Link to="/catalogo" className="hidden md:inline-flex items-center gap-2 text-[13px] font-semibold link-underline">
+                            Ver todo <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                    </header>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-14 md:gap-y-20">
+                        {featured.map((p) => (
+                            <ProductCard key={p.id} product={p} onAddToCart={(prod) => addToCart(prod, 1)} />
+                        ))}
                     </div>
                 </section>
             )}
 
-            {offers.length > 0 && (
-                <section className="py-16 md:py-20 bg-zinc-950 text-white">
-                    <div className="container mx-auto px-4">
-                        <div className="flex items-end justify-between mb-10">
-                            <div>
-                                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D52B1E]">Ofertas</span>
-                                <h2 className="text-3xl md:text-4xl font-black tracking-tight mt-1">Bajamos precio</h2>
-                            </div>
-                            <Link
-                                to="/catalogo?ofertas=1"
-                                className="hidden md:flex items-center gap-2 text-sm font-bold text-white hover:gap-3 transition-all"
+            {/* Category guide — 3 wide entry tiles, no card-on-card */}
+            <section className="border-t border-line bg-paper-2/60">
+                <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-28">
+                    <p className="text-eyebrow text-ink-3 mb-3">Por categoría</p>
+                    <h2 className="text-headline text-ink mb-12 max-w-2xl">
+                        Encontrá rápido lo que estás buscando.
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-line">
+                        {[
+                            { name: 'Audio', meta: 'Auriculares · parlantes' },
+                            { name: 'Celulares', meta: 'iPhone · Samsung · Xiaomi' },
+                            { name: 'Smartwatch', meta: 'Garmin · Apple Watch' },
+                            { name: 'Gaming', meta: 'Nintendo · accesorios' },
+                            { name: 'Accesorios', meta: 'Cables · cargadores' },
+                            { name: 'Televisores', meta: 'Smart TV · proyectores' },
+                            { name: 'Cámaras', meta: 'Action cams · drones' },
+                            { name: 'Computación', meta: 'Notebooks · periféricos' },
+                        ].map((c, i) => (
+                            <motion.div
+                                key={c.name}
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.4, delay: i * 0.04 }}
                             >
-                                Ver todas <ArrowRight className="h-4 w-4" />
+                                <Link
+                                    to={`/catalogo?categoria=${encodeURIComponent(c.name)}`}
+                                    className="group block bg-paper p-6 h-full hover:bg-paper transition-colors"
+                                >
+                                    <span className="text-eyebrow text-ink-3">0{i + 1}</span>
+                                    <h3 className="text-title text-ink mt-2 group-hover:translate-x-1 transition-transform duration-300 inline-flex items-center gap-2">
+                                        {c.name}
+                                        <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </h3>
+                                    <p className="text-[12px] text-ink-3 mt-1">{c.meta}</p>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Offers — committed dark surface, single block */}
+            {offers.length > 0 && (
+                <section className="bg-night text-paper">
+                    <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-28">
+                        <header className="flex items-end justify-between mb-12 gap-6">
+                            <div>
+                                <p className="text-eyebrow text-paper/60 mb-3">Edición rebajada</p>
+                                <h2 className="text-headline text-paper">Ofertas vigentes</h2>
+                            </div>
+                            <Link to="/catalogo?ofertas=1" className="hidden md:inline-flex items-center gap-2 text-[13px] font-semibold link-underline">
+                                Ver todas <ArrowUpRight className="h-4 w-4" />
                             </Link>
-                        </div>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                        </header>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-14">
                             {offers.map((p) => (
                                 <ProductCard key={p.id} product={p} onAddToCart={(prod) => addToCart(prod, 1)} dark />
                             ))}
@@ -89,35 +121,34 @@ export default function Home() {
                 </section>
             )}
 
-            <section className="py-20 border-y bg-zinc-50/60">
-                <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
-                        {[
-                            { icon: ShieldCheck, title: 'Garantía oficial', text: 'Productos con garantía directa del fabricante.' },
-                            { icon: Truck, title: 'Envíos a todo Paraguay', text: 'Coordinamos por WhatsApp, llegamos a todo el país.' },
-                            { icon: CreditCard, title: 'Pagos seguros', text: 'Múltiples medios de pago, factura legal en cada compra.' },
-                        ].map((f) => (
-                            <motion.div
-                                key={f.title}
-                                initial={{ opacity: 0, y: 12 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                className="flex gap-5"
-                            >
-                                <div className="h-14 w-14 shrink-0 bg-white rounded-2xl border flex items-center justify-center">
-                                    <f.icon className="h-7 w-7 text-[#0038A8]" />
+            {/* Promise — 3 simple statements, asymmetric */}
+            <section className="border-t border-line">
+                <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-24">
+                    <div className="grid grid-cols-12 gap-x-6 gap-y-10">
+                        <div className="col-span-12 lg:col-span-5">
+                            <p className="text-eyebrow text-ink-3 mb-3">El método Vos PY</p>
+                            <h2 className="text-headline text-ink max-w-md">
+                                Tres certezas antes
+                                <br />
+                                de cualquier compra.
+                            </h2>
+                        </div>
+                        <div className="col-span-12 lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[
+                                { icon: ShieldCheck, t: 'Garantía oficial', d: 'Cobertura directa del fabricante en todos los productos.' },
+                                { icon: Truck, t: 'Despacho nacional', d: 'Asunción y Gran Asunción en 24/48 h. Interior por courier.' },
+                                { icon: MessageCircle, t: 'Por WhatsApp', d: 'Coordinamos el pago y la entrega de manera directa.' },
+                            ].map((f) => (
+                                <div key={f.t}>
+                                    <f.icon className="h-6 w-6 text-ink mb-4" strokeWidth={1.6} />
+                                    <h3 className="text-title text-ink mb-2">{f.t}</h3>
+                                    <p className="text-[14px] text-ink-2 leading-relaxed">{f.d}</p>
                                 </div>
-                                <div>
-                                    <h3 className="font-bold mb-1">{f.title}</h3>
-                                    <p className="text-sm text-muted-foreground">{f.text}</p>
-                                </div>
-                            </motion.div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
-
-            <About />
         </>
     );
 }
