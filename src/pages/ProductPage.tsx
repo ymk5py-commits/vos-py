@@ -210,22 +210,37 @@ export default function ProductPage() {
                             <Facet icon={ShieldCheck} title="Garantía" sub="Oficial fábrica" />
                             <Facet icon={RefreshCw} title="Devolución" sub="7 días Ley 1334" />
                         </dl>
-
-                        <div className="mt-8 pt-6 border-t border-line space-y-1.5 text-[14px]">
-                            <Row k="Marca" v={product.brand} />
-                            <Row k="Categoría" v={product.category} />
-                            {product.codigo && <Row k="Código" v={product.codigo} mono />}
-                        </div>
                     </div>
                 </div>
 
-                {/* Description */}
-                <div className="mt-20 md:mt-28 max-w-3xl">
-                    <p className="text-eyebrow text-ink-3 mb-3">Sobre el producto</p>
-                    <h2 className="text-headline text-ink mb-6">Descripción</h2>
-                    <p className="text-[16px] md:text-[17px] text-ink-2 leading-[1.75] whitespace-pre-line">
-                        {product.fullDescription || product.description}
-                    </p>
+                {/* Description + Bento of services */}
+                <div className="mt-20 md:mt-28 grid lg:grid-cols-12 gap-x-12 gap-y-12">
+                    <div className="lg:col-span-7">
+                        <p className="text-eyebrow text-ink-3 mb-3">Sobre el producto</p>
+                        <h2 className="text-headline text-ink mb-6">Descripción</h2>
+                        <p className="text-[16px] md:text-[17px] text-ink-2 leading-[1.75] whitespace-pre-line">
+                            {product.fullDescription || product.description}
+                        </p>
+                    </div>
+
+                    {/* Specs / quick facts strip */}
+                    <aside className="lg:col-span-5 lg:pl-8 lg:border-l border-line">
+                        <p className="text-eyebrow text-ink-3 mb-5">Datos del producto</p>
+                        <div className="grid grid-cols-2 gap-px bg-line border border-line">
+                            <SpecCell n="01" k="Marca" v={product.brand} />
+                            <SpecCell n="02" k="Categoría" v={product.category} />
+                            {product.codigo && <SpecCell n="03" k="Código" v={product.codigo} mono />}
+                            <SpecCell n={product.codigo ? "04" : "03"} k="Stock" v={`${product.stock ?? 0} u.`} mono />
+                        </div>
+
+                        <p className="text-eyebrow text-ink-3 mt-10 mb-5">Servicios incluidos</p>
+                        <div className="grid grid-cols-2 gap-px bg-line border border-line">
+                            <ServiceCell icon={Truck} title="Envío nacional" desc="24/48 h en GA. Interior por courier." />
+                            <ServiceCell icon={ShieldCheck} title="Garantía oficial" desc="Directa del fabricante." />
+                            <ServiceCell icon={RefreshCw} title="Arrepentimiento" desc="7 días — Ley 1334/98." />
+                            <ServiceCell icon={MessageCircle} title="Soporte" desc="Por WhatsApp, antes y después." dark />
+                        </div>
+                    </aside>
                 </div>
 
                 {/* Related — horizontal rail */}
@@ -267,5 +282,23 @@ const Row = ({ k, v, mono = false }: { k: string; v: string; mono?: boolean }) =
     <div className="flex justify-between gap-4">
         <dt className="text-ink-3">{k}</dt>
         <dd className={`text-ink ${mono ? 'tabular' : ''}`}>{v}</dd>
+    </div>
+);
+
+const SpecCell = ({ n, k, v, mono = false }: { n: string; k: string; v: string; mono?: boolean }) => (
+    <div className="bg-paper p-5">
+        <span className="text-eyebrow text-ink-3 tabular">{n}</span>
+        <p className="text-[11px] uppercase tracking-wider text-ink-3 mt-2">{k}</p>
+        <p className={`text-[15px] font-semibold text-ink mt-0.5 ${mono ? 'tabular' : ''}`}>{v}</p>
+    </div>
+);
+
+const ServiceCell = ({
+    icon: Icon, title, desc, dark = false,
+}: { icon: any; title: string; desc: string; dark?: boolean }) => (
+    <div className={`p-5 ${dark ? 'bg-ink text-paper' : 'bg-paper text-ink'}`}>
+        <Icon className={`h-5 w-5 mb-3 ${dark ? 'text-paper' : 'text-ink'}`} strokeWidth={1.6} />
+        <p className={`text-[13px] font-bold ${dark ? 'text-paper' : 'text-ink'}`}>{title}</p>
+        <p className={`text-[11px] mt-1 ${dark ? 'text-paper/70' : 'text-ink-3'} leading-snug`}>{desc}</p>
     </div>
 );

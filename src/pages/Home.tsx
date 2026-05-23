@@ -8,6 +8,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowUpRight, Truck, ShieldCheck, MessageCircle } from 'lucide-react';
 import { Hero } from '../components/Hero';
+import { BentoFeatured } from '../components/BentoFeatured';
+import { ProductRail } from '../components/ProductRail';
 import { ProductCard } from '../components/ProductCard';
 import { loadProducts, Product } from '../data/products';
 import { useStore } from '../store';
@@ -21,14 +23,14 @@ export default function Home() {
 
     useEffect(() => { loadProducts().then(setProducts); }, []);
 
-    const featured = products.slice(0, 6);
+    const bestsellers = products.slice(8, 18);
     const offers = products.filter((p) => p.discount > 0).slice(0, 4);
 
     return (
         <>
             <Hero onExplore={() => nav('/catalogo')} />
 
-            {/* Marquee — brand wall, restrained */}
+            {/* Brand marquee — restrained, single line */}
             <div className="border-y border-line py-5 overflow-hidden bg-paper">
                 <div className="animate-marquee text-ink-3 text-[13px] font-semibold tracking-[0.25em] uppercase">
                     {[...BRANDS, ...BRANDS].map((b, i) => (
@@ -37,34 +39,35 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* Editor's picks — asymmetric editorial composition */}
-            {featured.length > 0 && (
-                <section className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-28">
-                    <header className="flex items-end justify-between mb-12 gap-6">
-                        <div>
-                            <p className="text-eyebrow text-ink-3 mb-3">Selección de la semana</p>
-                            <h2 className="text-headline text-ink">Lo nuevo en Vos PY</h2>
-                        </div>
+            {/* Bento featured — main visual moment */}
+            <BentoFeatured products={products} />
+
+            {/* Bestsellers rail — horizontal scroll for rhythm */}
+            <div className="bg-paper-2/60 border-y border-line">
+                <ProductRail
+                    products={bestsellers}
+                    eyebrow="Más vendidos"
+                    title={<>Lo que llega y se va<span className="text-py-red">.</span></>}
+                    cta={
                         <Link to="/catalogo" className="hidden md:inline-flex items-center gap-2 text-[13px] font-semibold link-underline">
                             Ver todo <ArrowUpRight className="h-4 w-4" />
                         </Link>
-                    </header>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-14 md:gap-y-20">
-                        {featured.map((p) => (
-                            <ProductCard key={p.id} product={p} onAddToCart={(prod) => addToCart(prod, 1)} />
-                        ))}
-                    </div>
-                </section>
-            )}
+                    }
+                />
+            </div>
 
-            {/* Category guide — 3 wide entry tiles, no card-on-card */}
-            <section className="border-t border-line bg-paper-2/60">
+            {/* Category guide — clean 8-cell grid */}
+            <section className="border-t border-line">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-28">
-                    <p className="text-eyebrow text-ink-3 mb-3">Por categoría</p>
-                    <h2 className="text-headline text-ink mb-12 max-w-2xl">
-                        Encontrá rápido lo que estás buscando.
-                    </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-line">
+                    <header className="grid grid-cols-12 gap-x-6 gap-y-3 mb-12 items-end">
+                        <div className="col-span-12 lg:col-span-8">
+                            <p className="text-eyebrow text-ink-3 mb-3">Por categoría</p>
+                            <h2 className="text-headline text-ink max-w-2xl">
+                                Encontrá rápido lo que estás buscando.
+                            </h2>
+                        </div>
+                    </header>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-line border border-line">
                         {[
                             { name: 'Audio', meta: 'Auriculares · parlantes' },
                             { name: 'Celulares', meta: 'iPhone · Samsung · Xiaomi' },
@@ -84,9 +87,9 @@ export default function Home() {
                             >
                                 <Link
                                     to={`/catalogo?categoria=${encodeURIComponent(c.name)}`}
-                                    className="group block bg-paper p-6 h-full hover:bg-paper transition-colors"
+                                    className="group block bg-paper p-6 lg:p-7 h-full hover:bg-paper-2 transition-colors"
                                 >
-                                    <span className="text-eyebrow text-ink-3">0{i + 1}</span>
+                                    <span className="text-eyebrow text-ink-3 tabular">0{i + 1}</span>
                                     <h3 className="text-title text-ink mt-2 group-hover:translate-x-1 transition-transform duration-300 inline-flex items-center gap-2">
                                         {c.name}
                                         <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -99,18 +102,22 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Offers — committed dark surface, single block */}
+            {/* Offers — dark surface, committed block */}
             {offers.length > 0 && (
                 <section className="bg-night text-paper">
                     <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-28">
-                        <header className="flex items-end justify-between mb-12 gap-6">
-                            <div>
-                                <p className="text-eyebrow text-paper/60 mb-3">Edición rebajada</p>
-                                <h2 className="text-headline text-paper">Ofertas vigentes</h2>
+                        <header className="grid grid-cols-12 gap-x-6 gap-y-3 mb-12 items-end">
+                            <div className="col-span-12 lg:col-span-8">
+                                <p className="text-eyebrow text-paper/60 mb-3">Edición rebajada · Esta semana</p>
+                                <h2 className="text-headline text-paper">
+                                    Ofertas vigentes<span className="text-py-red">.</span>
+                                </h2>
                             </div>
-                            <Link to="/catalogo?ofertas=1" className="hidden md:inline-flex items-center gap-2 text-[13px] font-semibold link-underline">
-                                Ver todas <ArrowUpRight className="h-4 w-4" />
-                            </Link>
+                            <div className="col-span-12 lg:col-span-4 lg:text-right">
+                                <Link to="/catalogo?ofertas=1" className="inline-flex items-center gap-2 text-[13px] font-semibold text-paper hover:gap-3 transition-all">
+                                    Ver todas <ArrowUpRight className="h-4 w-4" />
+                                </Link>
+                            </div>
                         </header>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-14">
                             {offers.map((p) => (
@@ -121,7 +128,7 @@ export default function Home() {
                 </section>
             )}
 
-            {/* Promise — 3 simple statements, asymmetric */}
+            {/* Promise — three statements, asymmetric editorial */}
             <section className="border-t border-line">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-20 md:py-24">
                     <div className="grid grid-cols-12 gap-x-6 gap-y-10">
