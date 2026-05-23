@@ -10,6 +10,7 @@ import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { LoginModal } from './components/LoginModal';
 import { CookieBanner } from './components/CookieBanner';
+import { WhatsAppFAB } from './components/WhatsAppFAB';
 import { useStore } from './store';
 import { categories } from './data/products';
 
@@ -68,6 +69,7 @@ export default function Layout() {
                 onClose={store.closeLogin}
                 onLogin={store.login}
             />
+            <WhatsAppFAB />
             <CookieBanner />
         </div>
     );

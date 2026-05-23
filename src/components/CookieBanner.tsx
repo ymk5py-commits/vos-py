@@ -36,7 +36,7 @@ export const CookieBanner = () => {
                     transition={{ type: 'spring', stiffness: 280, damping: 28 }}
                     role="dialog"
                     aria-label="Aviso de cookies"
-                    className="fixed inset-x-3 bottom-3 md:inset-x-auto md:right-6 md:bottom-6 md:max-w-md z-[60] bg-zinc-950 text-white rounded-2xl shadow-2xl border border-white/10 p-5"
+                    className="fixed inset-x-3 bottom-3 md:inset-x-auto md:left-6 md:bottom-6 md:max-w-md z-[60] bg-zinc-950 text-white rounded-2xl shadow-2xl border border-white/10 p-5"
                 >
                     <button
                         onClick={() => set('essential')}
