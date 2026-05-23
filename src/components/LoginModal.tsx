@@ -20,25 +20,28 @@ export const LoginModal = ({
     isOpen, 
     onClose, 
     onLogin 
-}: { 
-    isOpen: boolean; 
-    onClose: () => void; 
-    onLogin: (user: any) => void 
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onLogin: (user: { name: string; email: string }) => void
 }) => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
 
+    const [err, setErr] = useState<string | null>(null);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Mock login
-        const mockUser = {
-            id: 'user_123',
-            email,
-            name: name || email.split('@')[0],
-        };
-        onLogin(mockUser);
+        const cleanEmail = email.trim().slice(0, 254);
+        const cleanName = (name || cleanEmail.split('@')[0]).trim().slice(0, 80);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) {
+            setErr('Ingresá un correo electrónico válido.');
+            return;
+        }
+        setErr(null);
+        onLogin({ email: cleanEmail, name: cleanName });
         onClose();
     };
 
@@ -50,9 +53,12 @@ export const LoginModal = ({
                         {isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}
                     </DialogTitle>
                     <DialogDescription className="text-center">
-                        {isSignUp 
-                            ? 'Únete a Vos PY y disfruta de beneficios exclusivos.' 
-                            : 'Bienvenido de nuevo a la mejor tienda de Paraguay.'}
+                        {isSignUp
+                            ? 'Únete a Vos PY y disfrutá de beneficios exclusivos.'
+                            : 'Bienvenido de nuevo.'}
+                        <span className="block mt-2 text-[10px] font-bold uppercase tracking-widest text-amber-600">
+                            Beta · acceso sin cuenta real
+                        </span>
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -110,6 +116,7 @@ export const LoginModal = ({
                             </Label>
                         </div>
                     )}
+                    {err && <p className="text-xs text-[#D52B1E] font-semibold">{err}</p>}
                     <Button type="submit" className="w-full bg-[#0038A8] hover:bg-[#002b80] text-white py-6 text-lg font-bold">
                         {isSignUp ? 'Registrarse' : 'Entrar'}
                     </Button>

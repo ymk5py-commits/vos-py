@@ -4,6 +4,7 @@
  */
 
 import { Logo } from './Logo';
+import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -65,15 +66,13 @@ export const Footer = ({ categories, onSelectCategory, onShowAbout }: FooterProp
                     <div>
                         <h4 className="font-bold mb-6 uppercase tracking-wider text-xs">Información</h4>
                         <ul className="space-y-3.5 text-sm text-zinc-400">
-                            <li>
-                                <button onClick={onShowAbout} className="hover:text-white transition-colors">
-                                    Sobre Nosotros
-                                </button>
-                            </li>
-                            <li><a href="#contacto" className="hover:text-white transition-colors">Términos y Condiciones</a></li>
-                            <li><a href="#contacto" className="hover:text-white transition-colors">Política de Privacidad</a></li>
-                            <li><a href="#contacto" className="hover:text-white transition-colors">Ventas Corporativas</a></li>
-                            <li><a href="#contacto" className="hover:text-white transition-colors">Sucursales</a></li>
+                            <li><Link to="/nosotros" className="hover:text-white transition-colors">Sobre Nosotros</Link></li>
+                            <li><Link to="/terminos" className="hover:text-white transition-colors">Términos y Condiciones</Link></li>
+                            <li><Link to="/privacidad" className="hover:text-white transition-colors">Política de Privacidad</Link></li>
+                            <li><Link to="/cookies" className="hover:text-white transition-colors">Política de Cookies</Link></li>
+                            <li><Link to="/devoluciones" className="hover:text-white transition-colors">Devoluciones</Link></li>
+                            <li><Link to="/envios" className="hover:text-white transition-colors">Envíos</Link></li>
+                            <li><Link to="/garantia" className="hover:text-white transition-colors">Garantía</Link></li>
                         </ul>
                     </div>
 

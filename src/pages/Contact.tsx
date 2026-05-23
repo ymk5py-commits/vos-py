@@ -1,0 +1,79 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { Link } from 'react-router-dom';
+import { MessageCircle, Mail, MapPin, Phone, ChevronRight, Clock } from 'lucide-react';
+
+export default function Contact() {
+    return (
+        <section className="container mx-auto px-4 py-10 md:py-16">
+            <nav className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#0038A8]/70 mb-6">
+                <Link to="/" className="hover:text-[#0038A8]">Inicio</Link>
+                <ChevronRight className="h-3 w-3" />
+                <span className="text-[#0038A8]">Contacto</span>
+            </nav>
+            <div className="max-w-3xl">
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D52B1E]">Ayuda</span>
+                <h1 className="text-3xl md:text-5xl font-black tracking-tight mt-1 mb-4">Hablemos</h1>
+                <p className="text-lg text-muted-foreground mb-10">
+                    El canal más rápido es WhatsApp. También podés escribirnos por correo o pasar
+                    por nuestras oficinas en Asunción.
+                </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+                <a
+                    href="https://wa.me/?text=Hola%2C%20quiero%20hacer%20una%20consulta"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-3xl bg-emerald-600 text-white p-8 hover:bg-emerald-700 transition-colors group"
+                >
+                    <MessageCircle className="h-9 w-9 mb-4" />
+                    <h2 className="text-2xl font-black mb-2">WhatsApp</h2>
+                    <p className="text-sm opacity-90 mb-4">El medio más rápido para consultas, pedidos y post-venta.</p>
+                    <span className="text-sm font-bold inline-flex items-center gap-2 group-hover:gap-3 transition-all">
+                        Iniciar conversación <ChevronRight className="h-4 w-4" />
+                    </span>
+                </a>
+                <a
+                    href="mailto:contacto@vospy.com.py"
+                    className="rounded-3xl bg-zinc-950 text-white p-8 hover:bg-zinc-800 transition-colors group"
+                >
+                    <Mail className="h-9 w-9 mb-4" />
+                    <h2 className="text-2xl font-black mb-2">Email</h2>
+                    <p className="text-sm opacity-80 mb-4">contacto@vospy.com.py — respondemos en 1 día hábil.</p>
+                    <span className="text-sm font-bold inline-flex items-center gap-2 group-hover:gap-3 transition-all">
+                        Enviar mensaje <ChevronRight className="h-4 w-4" />
+                    </span>
+                </a>
+            </div>
+
+            <div className="mt-10 grid md:grid-cols-3 gap-6">
+                <div className="rounded-2xl border p-6">
+                    <MapPin className="h-6 w-6 text-[#0038A8] mb-3" />
+                    <h3 className="font-bold mb-1">Dirección</h3>
+                    <p className="text-sm text-muted-foreground">Asunción, Paraguay</p>
+                </div>
+                <div className="rounded-2xl border p-6">
+                    <Phone className="h-6 w-6 text-[#0038A8] mb-3" />
+                    <h3 className="font-bold mb-1">Teléfono</h3>
+                    <p className="text-sm text-muted-foreground">+595 21 000 000</p>
+                </div>
+                <div className="rounded-2xl border p-6">
+                    <Clock className="h-6 w-6 text-[#0038A8] mb-3" />
+                    <h3 className="font-bold mb-1">Horario</h3>
+                    <p className="text-sm text-muted-foreground">Lun. a Sáb. 9:00 a 18:00 hs.</p>
+                </div>
+            </div>
+
+            <div className="mt-10 text-sm text-muted-foreground">
+                ¿Buscás información legal? Consultá nuestras políticas de
+                {' '}<Link to="/devoluciones" className="text-[#0038A8] font-semibold">Devoluciones</Link>,
+                {' '}<Link to="/envios" className="text-[#0038A8] font-semibold">Envíos</Link> y
+                {' '}<Link to="/garantia" className="text-[#0038A8] font-semibold">Garantía</Link>.
+            </div>
+        </section>
+    );
+}

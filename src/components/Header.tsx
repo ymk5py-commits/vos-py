@@ -4,6 +4,7 @@
  */
 
 import { Search, ShoppingCart, User, Menu, ChevronDown, Tag, Info, LifeBuoy } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Logo } from './Logo';
@@ -143,9 +144,9 @@ export const Header = ({
                         </Sheet>
                     </div>
 
-                    <a href="/" className="shrink-0 flex items-center" aria-label="Vos PY inicio">
+                    <Link to="/" className="shrink-0 flex items-center" aria-label="Vos PY inicio">
                         <Logo className="h-9 md:h-12 flex items-center" />
-                    </a>
+                    </Link>
 
                     {/* Desktop nav */}
                     <nav className="hidden lg:flex items-center gap-1">
