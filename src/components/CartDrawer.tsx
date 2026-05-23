@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Product, formatGs } from '../data/products';
 import {
     Sheet,
@@ -128,7 +129,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Envío</span>
-                                <span className="text-emerald-600 font-bold">¡GRATIS!</span>
+                                <span className="text-emerald-700 font-bold">a coordinar</span>
                             </div>
                             <Separator className="my-2" />
                             <div className="flex justify-between text-xl font-black">
@@ -136,14 +137,18 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                                 <span className="text-[#0038A8]">{formatGs(total)}</span>
                             </div>
                         </div>
-                        <Button 
-                            className="w-full h-14 bg-[#0038A8] hover:bg-[#002b80] text-white rounded-full text-lg font-black italic shadow-xl shadow-[#0038A8]/20 group"
+                        <Link
+                            to="/checkout"
+                            onClick={onClose}
+                            className="group inline-flex items-center justify-between gap-3 bg-ink text-paper w-full pl-6 pr-2 h-14 font-bold text-[14px] hover:bg-ink/90 transition-colors"
                         >
-                            PROCEDER AL PAGO
-                            <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                        </Button>
+                            <span>Finalizar compra</span>
+                            <span className="flex items-center justify-center w-10 h-10 bg-paper text-ink">
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                            </span>
+                        </Link>
                         <p className="text-[10px] text-center text-muted-foreground font-bold uppercase tracking-widest">
-                            Pagos Seguros • Envíos en 24/48hs • Garantía Vos PY
+                            Pago seguro · Envíos 24/48 h · Garantía oficial
                         </p>
                     </div>
                 )}

@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Search, ShoppingBag, User, Menu, ChevronDown, X } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, ChevronDown, X, LogOut, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import { useStore } from '../store';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
 import { Button } from './ui/button';
@@ -40,11 +41,15 @@ export const Header = ({
 }: HeaderProps) => {
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [catOpen, setCatOpen] = useState(false);
+    const [userOpen, setUserOpen] = useState(false);
     const catRef = useRef<HTMLDivElement>(null);
+    const userRef = useRef<HTMLDivElement>(null);
+    const { logout, lastOrder } = useStore();
 
     useEffect(() => {
         const onDoc = (e: MouseEvent) => {
             if (catRef.current && !catRef.current.contains(e.target as Node)) setCatOpen(false);
+            if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
         };
         document.addEventListener('mousedown', onDoc);
         return () => document.removeEventListener('mousedown', onDoc);
@@ -182,9 +187,58 @@ export const Header = ({
                         <Button variant="ghost" size="icon" className="lg:hidden hover:bg-paper-2" onClick={() => setMobileSearchOpen((v) => !v)} aria-label="Buscar">
                             {mobileSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={onLoginClick} className="hidden sm:flex hover:bg-paper-2" aria-label="Mi cuenta">
-                            <User className="h-5 w-5" strokeWidth={2.2} />
-                        </Button>
+                        {user ? (
+                            <div ref={userRef} className="relative hidden sm:block">
+                                <button
+                                    onClick={() => setUserOpen((v) => !v)}
+                                    className="h-10 inline-flex items-center gap-2 px-3 hover:bg-paper-2 rounded-md"
+                                    aria-label="Mi cuenta"
+                                >
+                                    <span className="h-7 w-7 bg-ink text-paper flex items-center justify-center text-[12px] font-bold tabular">
+                                        {user.name?.[0]?.toUpperCase() || 'U'}
+                                    </span>
+                                    <span className="hidden xl:inline text-[13px] font-semibold max-w-[120px] truncate">{user.name}</span>
+                                    <ChevronDown className={`h-3.5 w-3.5 transition-transform ${userOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                    {userOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 6 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 6 }}
+                                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                                            className="absolute right-0 mt-2 w-64 bg-paper border border-line shadow-2xl"
+                                        >
+                                            <div className="p-4 border-b border-line">
+                                                <p className="text-eyebrow text-ink-3 mb-1">Conectado como</p>
+                                                <p className="text-[13px] font-bold text-ink truncate">{user.name}</p>
+                                                <p className="text-[12px] text-ink-3 truncate">{user.email}</p>
+                                            </div>
+                                            {lastOrder && (
+                                                <Link
+                                                    to={`/orden/${lastOrder.id}`}
+                                                    onClick={() => setUserOpen(false)}
+                                                    className="flex items-center gap-2 px-4 py-3 text-[13px] hover:bg-paper-2"
+                                                >
+                                                    <Package className="h-4 w-4" /> Último pedido
+                                                    <span className="ml-auto tabular text-[11px] text-ink-3">{lastOrder.id.split('-')[2]}</span>
+                                                </Link>
+                                            )}
+                                            <button
+                                                onClick={() => { setUserOpen(false); logout(); }}
+                                                className="w-full text-left flex items-center gap-2 px-4 py-3 text-[13px] hover:bg-paper-2 text-py-red border-t border-line"
+                                            >
+                                                <LogOut className="h-4 w-4" /> Cerrar sesión
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ) : (
+                            <Button variant="ghost" size="icon" onClick={onLoginClick} className="hidden sm:flex hover:bg-paper-2" aria-label="Iniciar sesión">
+                                <User className="h-5 w-5" strokeWidth={2.2} />
+                            </Button>
+                        )}
                         <div className="relative">
                             <Button variant="ghost" size="icon" onClick={onCartClick} className="hover:bg-paper-2" aria-label="Carrito">
                                 <ShoppingBag className="h-5 w-5" strokeWidth={2.2} />

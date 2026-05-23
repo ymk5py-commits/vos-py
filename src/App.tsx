@@ -10,6 +10,8 @@ import Catalog from './pages/Catalog';
 import ProductPage from './pages/ProductPage';
 import Contact from './pages/Contact';
 import AboutPage from './pages/AboutPage';
+import Checkout from './pages/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation';
 import { Terms, Privacy, Cookies, Returns, Shipping, Warranty } from './pages/LegalPages';
 import { Link } from 'react-router-dom';
 
@@ -33,6 +35,8 @@ export default function App() {
         <Route path="/producto/:id" element={<ProductPage />} />
         <Route path="/nosotros" element={<AboutPage />} />
         <Route path="/contacto" element={<Contact />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/orden/:id" element={<OrderConfirmation />} />
         <Route path="/terminos" element={<Terms />} />
         <Route path="/privacidad" element={<Privacy />} />
         <Route path="/cookies" element={<Cookies />} />
