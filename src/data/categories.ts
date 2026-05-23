@@ -35,5 +35,13 @@ export const categories: { name: string; icon: string }[] = [
   {
     "name": "Computación",
     "icon": "Laptop"
+  },
+  {
+    "name": "Juegos y Recreación",
+    "icon": "Gamepad2"
+  },
+  {
+    "name": "Hogar y Jardín",
+    "icon": "Home"
   }
 ];
