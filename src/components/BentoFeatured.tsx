@@ -39,8 +39,8 @@ export const BentoFeatured: React.FC<Props> = ({ products }) => {
                 </Link>
             </header>
 
-            {/* Bento grid: 4 cols × 3 rows on desktop, stacked on mobile */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(220px,1fr)] gap-3 md:gap-4">
+            {/* Bento grid: 4 cols × 3 rows on desktop, 2 cols on mobile */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(170px,1fr)] sm:auto-rows-[minmax(220px,1fr)] gap-2 sm:gap-3 md:gap-4">
                 {/* HERO cell — large product, takes 2x2 */}
                 <BentoHero product={hero} onAdd={() => addToCart(hero, 1)} />
 
@@ -76,7 +76,7 @@ const BentoHero: React.FC<{ product: Product; onAdd: () => void }> = ({ product,
             className="relative col-span-2 row-span-2 bg-paper-2 overflow-hidden group"
         >
             <Link to={`/producto/${product.id}`} className="block h-full">
-                <div className="absolute inset-0 flex items-center justify-center p-10 md:p-14">
+                <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10 md:p-14">
                     {err ? (
                         <span className="text-display-m text-ink-3 opacity-25">VP</span>
                     ) : (
@@ -100,21 +100,21 @@ const BentoHero: React.FC<{ product: Product; onAdd: () => void }> = ({ product,
                     )}
                 </div>
                 {/* Bottom info */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 bg-gradient-to-t from-paper/95 via-paper/80 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 bg-gradient-to-t from-paper/95 via-paper/80 to-transparent">
                     <p className="text-eyebrow text-ink-3 mb-1">{product.brand}</p>
-                    <h3 className="text-title md:text-headline text-ink line-clamp-2 max-w-md">{safeTitle(product.name)}</h3>
-                    <div className="flex items-end justify-between mt-3">
+                    <h3 className="text-[15px] sm:text-title md:text-headline font-bold tracking-tight text-ink line-clamp-2 max-w-md leading-tight">{safeTitle(product.name)}</h3>
+                    <div className="flex items-end justify-between mt-2 sm:mt-3">
                         <div>
                             {hasDiscount && (
                                 <span className="block text-[12px] line-through tabular text-ink-3">{formatGs(product.listGs)}</span>
                             )}
-                            <span className={`block text-2xl md:text-3xl font-bold tabular leading-none ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
+                            <span className={`block text-lg sm:text-2xl md:text-3xl font-bold tabular leading-none ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
                                 {formatGs(product.priceGs)}
                             </span>
                         </div>
                         <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-                            className="h-12 w-12 bg-ink text-paper flex items-center justify-center hover:bg-ink/90 transition-colors"
+                            className="h-11 w-11 sm:h-12 sm:w-12 bg-ink text-paper flex items-center justify-center hover:bg-ink/90 transition-colors shrink-0"
                             aria-label={`Agregar ${product.name}`}
                         >
                             <Plus className="h-5 w-5" strokeWidth={2.4} />
@@ -183,15 +183,15 @@ const BentoPromoDark: React.FC = () => (
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="col-span-2 bg-night text-paper relative overflow-hidden group"
     >
-        <Link to="/catalogo?ofertas=1" className="block h-full p-7 md:p-9 flex flex-col justify-between">
+        <Link to="/catalogo?ofertas=1" className="block h-full p-5 sm:p-7 md:p-9 flex flex-col justify-between">
             <span className="text-eyebrow text-paper/60">Hasta −15%</span>
             <div>
-                <h3 className="text-headline text-paper leading-[0.95] mb-2">
+                <h3 className="text-[22px] sm:text-headline font-extrabold tracking-tight text-paper leading-[0.95] mb-2">
                     Cargadores y cables
                     <br />
                     <span className="text-py-red">rebajados.</span>
                 </h3>
-                <div className="flex items-center gap-2 text-[13px] font-semibold mt-4 group-hover:gap-3 transition-all">
+                <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold mt-3 sm:mt-4 group-hover:gap-3 transition-all">
                     Ver todas las ofertas <ArrowUpRight className="h-4 w-4" />
                 </div>
             </div>
@@ -213,15 +213,15 @@ const BentoWhatsApp: React.FC = () => (
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="col-span-2 bg-emerald-600 text-paper relative overflow-hidden group p-7 md:p-9 flex flex-col justify-between hover:bg-emerald-700 transition-colors"
+        className="col-span-2 bg-emerald-600 text-paper relative overflow-hidden group p-5 sm:p-7 md:p-9 flex flex-col justify-between hover:bg-emerald-700 transition-colors"
     >
         <span className="text-eyebrow text-paper/70">Consulta directa</span>
         <div>
-            <h3 className="text-headline text-paper leading-[0.95] mb-2">
+            <h3 className="text-[22px] sm:text-headline font-extrabold tracking-tight text-paper leading-[0.95] mb-2">
                 Coordiná tu compra<br />
                 por WhatsApp.
             </h3>
-            <div className="flex items-center gap-2 text-[13px] font-semibold mt-4 group-hover:gap-3 transition-all">
+            <div className="flex items-center gap-2 text-[12px] sm:text-[13px] font-semibold mt-3 sm:mt-4 group-hover:gap-3 transition-all">
                 <MessageCircle className="h-4 w-4" /> Iniciar conversación
             </div>
         </div>

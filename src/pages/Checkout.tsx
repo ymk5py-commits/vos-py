@@ -115,8 +115,8 @@ export default function Checkout() {
                         </motion.div>
                     </AnimatePresence>
 
-                    {/* Footer actions */}
-                    <div className="flex items-center justify-between mt-10 pt-8 border-t border-line">
+                    {/* Footer actions — desktop only (mobile uses sticky bottom bar below) */}
+                    <div className="hidden lg:flex items-center justify-between mt-10 pt-8 border-t border-line">
                         <button
                             onClick={goBack}
                             className="inline-flex items-center gap-2 text-[13px] font-semibold text-ink-2 hover:text-ink"
@@ -143,45 +143,98 @@ export default function Checkout() {
                     <Summary />
                 </aside>
             </div>
+
+            {/* Sticky bottom action bar — mobile only */}
+            <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 bg-paper border-t border-line shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.15)]">
+                <div className="px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-3">
+                    <button
+                        onClick={goBack}
+                        className="h-11 w-11 shrink-0 flex items-center justify-center border border-line"
+                        aria-label="Volver"
+                    >
+                        <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+                    </button>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-eyebrow text-ink-3 truncate">Total</p>
+                        <p className="text-[15px] font-bold tabular text-ink truncate">{formatGsHelper(s.cartTotal)}</p>
+                    </div>
+                    <button
+                        onClick={goNext}
+                        disabled={empty && step === 'cart'}
+                        className="group inline-flex items-center gap-2 bg-ink text-paper px-5 h-11 font-semibold text-[13px] hover:bg-ink/90 transition-colors disabled:opacity-40"
+                    >
+                        {step === 'payment' ? 'Confirmar' : 'Continuar'}
+                        {step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
+                    </button>
+                </div>
+            </div>
+            {/* Spacer for sticky bar on mobile */}
+            <div aria-hidden="true" className="lg:hidden h-20" />
         </section>
     );
 }
+
+// Local helper to format Gs without bringing the cart data here directly
+const formatGsHelper = (v: number) => `₲ ${v.toLocaleString('es-PY')}`;
 
 /* ---------------- Stepper ---------------- */
 
 const Stepper = ({ current, onSelect }: { current: StepId; onSelect: (id: StepId) => void }) => {
     const idx = STEPS.findIndex((s) => s.id === current);
+    const currentStep = STEPS[idx];
     return (
-        <ol className="grid grid-cols-4 gap-px bg-line border border-line">
-            {STEPS.map((s, i) => {
-                const done = i < idx;
-                const active = s.id === current;
-                return (
-                    <li key={s.id}>
-                        <button
-                            onClick={() => onSelect(s.id)}
-                            className={`w-full text-left p-4 md:p-5 flex items-center gap-3 transition-colors ${
-                                active ? 'bg-ink text-paper'
-                                : done ? 'bg-paper-2 text-ink hover:bg-paper-3'
-                                : 'bg-paper text-ink-3'
-                            }`}
-                            disabled={i > idx}
-                        >
-                            <span className={`h-7 w-7 shrink-0 flex items-center justify-center text-[11px] font-bold tabular ${
-                                active ? 'bg-paper text-ink'
-                                : done ? 'bg-ink text-paper' : 'bg-paper-2 text-ink-3'
-                            }`}>
-                                {done ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : s.n}
-                            </span>
-                            <span className="hidden sm:block">
-                                <p className={`text-[12px] uppercase tracking-wider font-semibold ${active ? 'text-paper/60' : 'text-ink-3'}`}>Paso {s.n}</p>
-                                <p className={`text-[14px] font-bold ${active ? 'text-paper' : ''}`}>{s.label}</p>
-                            </span>
-                        </button>
-                    </li>
-                );
-            })}
-        </ol>
+        <>
+            {/* Mobile: progress bar + current label */}
+            <div className="sm:hidden">
+                <div className="flex items-center justify-between mb-3">
+                    <div>
+                        <p className="text-eyebrow text-ink-3">Paso {currentStep.n} de 04</p>
+                        <p className="text-title text-ink mt-0.5">{currentStep.label}</p>
+                    </div>
+                    <span className="text-eyebrow text-ink-3 tabular">{Math.round(((idx + 1) / STEPS.length) * 100)}%</span>
+                </div>
+                <div className="h-1 bg-paper-2 overflow-hidden">
+                    <motion.div
+                        className="h-full bg-ink"
+                        initial={false}
+                        animate={{ width: `${((idx + 1) / STEPS.length) * 100}%` }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                </div>
+            </div>
+
+            {/* Desktop: full stepper */}
+            <ol className="hidden sm:grid sm:grid-cols-4 gap-px bg-line border border-line">
+                {STEPS.map((s, i) => {
+                    const done = i < idx;
+                    const active = s.id === current;
+                    return (
+                        <li key={s.id}>
+                            <button
+                                onClick={() => onSelect(s.id)}
+                                className={`w-full text-left p-4 md:p-5 flex items-center gap-3 transition-colors ${
+                                    active ? 'bg-ink text-paper'
+                                    : done ? 'bg-paper-2 text-ink hover:bg-paper-3'
+                                    : 'bg-paper text-ink-3'
+                                }`}
+                                disabled={i > idx}
+                            >
+                                <span className={`h-7 w-7 shrink-0 flex items-center justify-center text-[11px] font-bold tabular ${
+                                    active ? 'bg-paper text-ink'
+                                    : done ? 'bg-ink text-paper' : 'bg-paper-2 text-ink-3'
+                                }`}>
+                                    {done ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : s.n}
+                                </span>
+                                <span>
+                                    <p className={`text-[12px] uppercase tracking-wider font-semibold ${active ? 'text-paper/60' : 'text-ink-3'}`}>Paso {s.n}</p>
+                                    <p className={`text-[14px] font-bold ${active ? 'text-paper' : ''}`}>{s.label}</p>
+                                </span>
+                            </button>
+                        </li>
+                    );
+                })}
+            </ol>
+        </>
     );
 };
 

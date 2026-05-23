@@ -141,7 +141,7 @@ export const HeroCarousel = () => {
                 touchStartX.current = null;
             }}
         >
-            <div className="relative h-[70vh] min-h-[480px] max-h-[760px] overflow-hidden bg-paper">
+            <div className="relative h-[78dvh] min-h-[520px] max-h-[760px] sm:h-[70vh] overflow-hidden bg-paper">
                 <AnimatePresence mode="sync">
                     {SLIDES.map((s, i) => i === idx && (
                         <SlideView key={i} slide={s} />
@@ -246,25 +246,25 @@ const SlideView = ({ slide }: { slide: Slide }) => {
 
             {/* Text panel */}
             <div className={`relative z-10 col-span-12 lg:col-span-5 ${reverse ? 'lg:col-start-1 lg:row-start-1' : ''} flex items-end lg:items-center`}>
-                <div className="w-full px-5 md:px-8 lg:px-12 pb-24 pt-16 lg:py-12">
+                <div className="w-full px-5 md:px-8 lg:px-12 pb-20 sm:pb-24 pt-10 sm:pt-16 lg:py-12">
                     <motion.div
                         initial={{ opacity: 0, y: 18 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                         className="max-w-xl"
                     >
-                        <p className={`text-eyebrow mb-4 ${txtEyebrow}`}>{slide.eyebrow}</p>
-                        <h1 className={`text-display-m ${txt} mb-4 leading-[0.95]`}>
+                        <p className={`text-eyebrow mb-3 ${txtEyebrow}`}>{slide.eyebrow}</p>
+                        <h1 className={`text-[clamp(34px,7vw,72px)] lg:text-display-m font-extrabold tracking-[-0.035em] ${txt} mb-3 sm:mb-4 leading-[0.95]`}>
                             {slide.title}
                             <br />
                             <span className="text-py-red">{slide.accent}</span>
                         </h1>
-                        <p className={`text-[15px] md:text-[16px] ${txtMuted} mb-7 max-w-md`}>
+                        <p className={`text-[14px] sm:text-[15px] md:text-[16px] ${txtMuted} mb-6 sm:mb-7 max-w-md`}>
                             {slide.desc}
                         </p>
                         <Link
                             to={slide.cta.to}
-                            className="group inline-flex items-center gap-3 bg-paper text-ink lg:bg-paper hover:bg-paper/90 pl-6 pr-1.5 h-12 font-bold text-[14px] transition-colors"
+                            className="group inline-flex items-center gap-3 bg-paper text-ink hover:bg-paper/90 pl-6 pr-1.5 h-12 font-bold text-[14px] transition-colors"
                         >
                             {slide.cta.label}
                             <span className="flex items-center justify-center h-9 w-9 bg-ink text-paper transition-transform duration-300 group-hover:translate-x-0.5">

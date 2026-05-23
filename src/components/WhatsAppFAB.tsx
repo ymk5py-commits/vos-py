@@ -23,11 +23,15 @@ const buildHref = (msg: string) => {
         : `https://wa.me/?text=${text}`;
 };
 
-const HIDDEN_PATHS = [/^\/checkout/, /^\/orden\//];
+// Mobile-only paths where the sticky action bar would collide with the FAB.
+// Desktop keeps the FAB visible everywhere.
+const HIDDEN_PATHS_MOBILE = [/^\/checkout/, /^\/producto\//];
+const HIDDEN_PATHS_ALWAYS = [/^\/orden\//];
 
 export const WhatsAppFAB = () => {
     const { pathname } = useLocation();
-    const hidden = HIDDEN_PATHS.some((re) => re.test(pathname));
+    const hiddenAlways = HIDDEN_PATHS_ALWAYS.some((re) => re.test(pathname));
+    const hiddenMobile = HIDDEN_PATHS_MOBILE.some((re) => re.test(pathname));
     const [labelOpen, setLabelOpen] = useState(false);
     const [reduced, setReduced] = useState(false);
 
@@ -41,17 +45,17 @@ export const WhatsAppFAB = () => {
 
     // Hint label peeks once after the page settles.
     useEffect(() => {
-        if (hidden || reduced) return;
+        if (hiddenAlways || reduced) return;
         const t1 = window.setTimeout(() => setLabelOpen(true), 1800);
         const t2 = window.setTimeout(() => setLabelOpen(false), 6800);
         return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
-    }, [hidden, reduced, pathname]);
+    }, [hiddenAlways, reduced, pathname]);
 
-    if (hidden) return null;
+    if (hiddenAlways) return null;
 
     return (
         <div
-            className="fixed z-[55] right-4 md:right-6 bottom-4 md:bottom-6 flex items-center gap-3 flex-row-reverse"
+            className={`fixed z-[55] right-4 md:right-6 bottom-[calc(env(safe-area-inset-bottom)+16px)] md:bottom-6 flex items-center gap-3 flex-row-reverse ${hiddenMobile ? 'hidden md:flex' : 'flex'}`}
             onMouseEnter={() => setLabelOpen(true)}
             onMouseLeave={() => setLabelOpen(false)}
         >

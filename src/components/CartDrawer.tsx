@@ -6,149 +6,156 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Product, formatGs } from '../data/products';
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetFooter,
-} from './ui/sheet';
-import { Button } from './ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
 import { ScrollArea } from './ui/scroll-area';
-import { Separator } from './ui/separator';
 import { ShoppingBag, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface CartDrawerProps {
     isOpen: boolean;
     onClose: () => void;
-    items: { product: Product, quantity: number }[];
+    items: { product: Product; quantity: number }[];
     onUpdateQuantity: (productId: string, delta: number) => void;
     onRemoveItem: (productId: string) => void;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
-    isOpen,
-    onClose,
-    items,
-    onUpdateQuantity,
-    onRemoveItem
+    isOpen, onClose, items, onUpdateQuantity, onRemoveItem,
 }) => {
-    const total = items.reduce((acc, item) => acc + item.product.priceGs * item.quantity, 0);
+    const subtotal = items.reduce((a, b) => a + b.product.priceGs * b.quantity, 0);
+    const count = items.reduce((a, b) => a + b.quantity, 0);
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
-            <SheetContent className="w-full sm:max-w-md flex flex-col p-0 border-none">
-                <SheetHeader className="p-6 border-b">
-                    <SheetTitle className="flex items-center gap-2 text-2xl font-black italic text-[#0038A8]">
-                        <ShoppingBag className="h-6 w-6" />
-                        TU CARRITO
+            <SheetContent className="w-full sm:max-w-md flex flex-col p-0 border-l border-line bg-paper">
+                <SheetHeader className="px-5 sm:px-6 pt-6 pb-5 border-b border-line">
+                    <SheetTitle className="flex items-baseline gap-3">
+                        <ShoppingBag className="h-5 w-5 text-ink" strokeWidth={1.6} />
+                        <span className="text-title text-ink">Tu carrito</span>
+                        {count > 0 && (
+                            <span className="text-eyebrow text-ink-3 tabular">
+                                {count === 1 ? '1 producto' : `${count} productos`}
+                            </span>
+                        )}
                     </SheetTitle>
                 </SheetHeader>
 
-                <ScrollArea className="flex-1 p-6">
+                <ScrollArea className="flex-1">
                     {items.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
-                            <div className="bg-muted p-6 rounded-full">
-                                <ShoppingBag className="h-12 w-12 text-[#0038A8]/40" />
+                        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 space-y-4">
+                            <div className="h-14 w-14 bg-paper-2 flex items-center justify-center">
+                                <ShoppingBag className="h-6 w-6 text-ink-3" strokeWidth={1.4} />
                             </div>
-                            <h3 className="text-xl font-bold">Tu carrito está vacío</h3>
-                            <p className="text-muted-foreground">¡Agrega algo increíble para empezar!</p>
-                            <Button variant="outline" onClick={onClose} className="rounded-full px-8">
-                                Explorar Tienda
-                            </Button>
+                            <p className="text-eyebrow text-ink-3">Carrito vacío</p>
+                            <h3 className="text-title text-ink">Sin productos por ahora</h3>
+                            <p className="text-sm text-ink-2 max-w-xs">
+                                Explorá el catálogo y agregá lo que quieras llevar.
+                            </p>
+                            <button
+                                onClick={onClose}
+                                className="mt-4 inline-flex items-center gap-2 bg-ink text-paper h-11 px-6 font-semibold text-[13px] hover:bg-ink/90 transition-colors"
+                            >
+                                Explorar catálogo
+                            </button>
                         </div>
                     ) : (
-                        <div className="space-y-6">
-                            <AnimatePresence mode="popLayout">
+                        <ul className="divide-y divide-line">
+                            <AnimatePresence mode="popLayout" initial={false}>
                                 {items.map((item) => (
-                                    <motion.div
+                                    <motion.li
                                         key={item.product.id}
                                         layout
-                                        initial={{ opacity: 0, x: 20 }}
+                                        initial={{ opacity: 0, x: 12 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="flex gap-4"
+                                        exit={{ opacity: 0, x: -12 }}
+                                        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                                        className="px-5 sm:px-6 py-5 flex gap-4"
                                     >
-                                        <div className="h-24 w-24 rounded-xl overflow-hidden bg-muted shrink-0 shadow-inner">
+                                        <Link
+                                            to={`/producto/${item.product.id}`}
+                                            onClick={onClose}
+                                            className="block w-20 h-20 bg-paper-2 shrink-0"
+                                        >
                                             <img
                                                 src={item.product.image}
                                                 alt={item.product.name}
-                                                className="h-full w-full object-contain p-1 bg-white"
+                                                loading="lazy"
+                                                className="w-full h-full object-contain p-2"
                                             />
-                                        </div>
-                                        <div className="flex flex-col flex-1 gap-1">
-                                            <div className="flex justify-between items-start">
-                                                <h4 className="font-bold text-sm leading-tight line-clamp-2 pr-2">
-                                                    {item.product.name}
-                                                </h4>
-                                                <button 
-                                                    onClick={() => onRemoveItem(item.product.id)}
-                                                    className="text-muted-foreground hover:text-[#D52B1E] transition-colors"
+                                        </Link>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <Link
+                                                    to={`/producto/${item.product.id}`}
+                                                    onClick={onClose}
+                                                    className="block min-w-0 flex-1"
                                                 >
-                                                    <Trash2 className="h-4 w-4" />
+                                                    <p className="text-eyebrow text-ink-3 mb-0.5 truncate">{item.product.brand}</p>
+                                                    <h4 className="text-[13px] font-semibold text-ink line-clamp-2 leading-tight">
+                                                        {item.product.name.toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase())}
+                                                    </h4>
+                                                </Link>
+                                                <button
+                                                    onClick={() => onRemoveItem(item.product.id)}
+                                                    aria-label="Quitar del carrito"
+                                                    className="h-8 w-8 shrink-0 flex items-center justify-center text-ink-3 hover:text-py-red"
+                                                >
+                                                    <Trash2 className="h-4 w-4" strokeWidth={1.6} />
                                                 </button>
                                             </div>
-                                            <p className="text-xs text-muted-foreground italic mb-2">
-                                                Unidad: {formatGs(item.product.priceGs)}
-                                            </p>
-                                            <div className="flex justify-between items-center mt-auto">
-                                                <div className="flex items-center border rounded-full bg-muted/50 p-1">
-                                                    <button 
-                                                        className="p-1 hover:bg-white rounded-full transition-colors"
+                                            <div className="flex items-end justify-between mt-3 gap-2">
+                                                <div className="flex items-center border border-line">
+                                                    <button
                                                         onClick={() => onUpdateQuantity(item.product.id, -1)}
+                                                        aria-label="Disminuir"
+                                                        className="h-9 w-9 flex items-center justify-center hover:bg-paper-2"
                                                     >
-                                                        <Minus className="h-3 w-3" />
+                                                        <Minus className="h-3.5 w-3.5" strokeWidth={2} />
                                                     </button>
-                                                    <span className="w-8 text-center text-xs font-bold">{item.quantity}</span>
-                                                    <button 
-                                                        className="p-1 hover:bg-white rounded-full transition-colors"
+                                                    <span className="w-9 text-center text-[13px] font-semibold tabular">{item.quantity}</span>
+                                                    <button
                                                         onClick={() => onUpdateQuantity(item.product.id, 1)}
+                                                        aria-label="Aumentar"
+                                                        className="h-9 w-9 flex items-center justify-center hover:bg-paper-2"
                                                     >
-                                                        <Plus className="h-3 w-3" />
+                                                        <Plus className="h-3.5 w-3.5" strokeWidth={2} />
                                                     </button>
                                                 </div>
-                                                <span className="font-black text-[#0038A8]">
+                                                <p className="text-[14px] font-bold tabular text-ink whitespace-nowrap">
                                                     {formatGs(item.product.priceGs * item.quantity)}
-                                                </span>
+                                                </p>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </motion.li>
                                 ))}
                             </AnimatePresence>
-                        </div>
+                        </ul>
                     )}
                 </ScrollArea>
 
                 {items.length > 0 && (
-                    <div className="p-6 bg-zinc-50 border-t space-y-4">
-                        <div className="flex flex-col gap-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Subtotal</span>
-                                <span className="font-bold">{formatGs(total)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Envío</span>
-                                <span className="text-emerald-700 font-bold">a coordinar</span>
-                            </div>
-                            <Separator className="my-2" />
-                            <div className="flex justify-between text-xl font-black">
-                                <span>TOTAL</span>
-                                <span className="text-[#0038A8]">{formatGs(total)}</span>
-                            </div>
+                    <div className="px-5 sm:px-6 py-5 bg-paper border-t border-line space-y-4">
+                        <dl className="space-y-1.5 text-[13px]">
+                            <div className="flex justify-between"><dt className="text-ink-3">Subtotal</dt><dd className="tabular text-ink">{formatGs(subtotal)}</dd></div>
+                            <div className="flex justify-between"><dt className="text-ink-3">Envío</dt><dd className="text-emerald-700 font-semibold">a coordinar</dd></div>
+                        </dl>
+                        <div className="border-t border-line pt-3 flex justify-between items-baseline">
+                            <dt className="text-eyebrow text-ink-3">Total</dt>
+                            <dd className="text-2xl font-bold tabular text-ink">{formatGs(subtotal)}</dd>
                         </div>
                         <Link
                             to="/checkout"
                             onClick={onClose}
-                            className="group inline-flex items-center justify-between gap-3 bg-ink text-paper w-full pl-6 pr-2 h-14 font-bold text-[14px] hover:bg-ink/90 transition-colors"
+                            className="group inline-flex items-center justify-between gap-3 bg-ink text-paper w-full pl-6 pr-2 h-13 font-bold text-[14px] hover:bg-ink/90 transition-colors"
+                            style={{ height: 52 }}
                         >
                             <span>Finalizar compra</span>
                             <span className="flex items-center justify-center w-10 h-10 bg-paper text-ink">
-                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
                             </span>
                         </Link>
-                        <p className="text-[10px] text-center text-muted-foreground font-bold uppercase tracking-widest">
-                            Pago seguro · Envíos 24/48 h · Garantía oficial
+                        <p className="text-[10px] text-center text-ink-3 font-bold uppercase tracking-widest">
+                            Pago seguro · 24/48 h · Garantía oficial
                         </p>
                     </div>
                 )}

@@ -266,6 +266,37 @@ export default function ProductPage() {
                     </button>
                 </div>
             </div>
+
+            {/* Mobile sticky add-to-cart bar */}
+            <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-paper border-t border-line shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.15)]">
+                <div className="px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                        {hasDiscount && (
+                            <span className="block text-[11px] line-through tabular text-ink-3 leading-none">{formatGs(product.listGs)}</span>
+                        )}
+                        <p className={`text-[18px] font-bold tabular leading-tight ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
+                            {formatGs(product.priceGs)}
+                        </p>
+                    </div>
+                    <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-11 w-11 shrink-0 flex items-center justify-center border-2 border-emerald-500 text-emerald-600"
+                        aria-label="Consultar por WhatsApp"
+                    >
+                        <MessageCircle className="h-4 w-4" strokeWidth={2} />
+                    </a>
+                    <button
+                        onClick={() => addToCart(product, qty)}
+                        className="inline-flex items-center gap-2 bg-ink text-paper px-5 h-11 font-semibold text-[13px] hover:bg-ink/90 transition-colors"
+                    >
+                        <ShoppingCart className="h-4 w-4" strokeWidth={2} />
+                        Agregar
+                    </button>
+                </div>
+            </div>
+            <div aria-hidden="true" className="md:hidden h-20" />
         </article>
     );
 }
