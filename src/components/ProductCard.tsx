@@ -44,7 +44,7 @@ export const ProductCard: React.FC<Props> = ({ product, onAddToCart, dark = fals
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className={`group h-full flex flex-col ${dark ? 'bg-paper text-ink' : 'bg-paper border border-line hover:border-py-red/40 hover:shadow-lg'} transition-all duration-200`}
+            className={`group h-full flex flex-col will-change-transform ${dark ? 'bg-paper text-ink' : 'bg-paper border border-line hover:border-py-red/40 hover:shadow-[0_18px_40px_-22px_rgba(20,16,12,0.45)]'} transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1`}
         >
             <Link to={`/producto/${product.id}`} className="block">
                 {/* Image plate */}
@@ -111,7 +111,7 @@ export const ProductCard: React.FC<Props> = ({ product, onAddToCart, dark = fals
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="w-full mt-2 h-10 bg-emerald-600 text-paper text-[12px] font-extrabold tracking-wide uppercase hover:bg-emerald-700 transition-colors inline-flex items-center justify-center gap-2"
+                        className="press w-full mt-2 h-10 bg-emerald-600 text-paper text-[12px] font-extrabold tracking-wide uppercase hover:bg-emerald-700 transition-colors inline-flex items-center justify-center gap-2"
                     >
                         <MessageCircle className="h-3.5 w-3.5" strokeWidth={2.4} />
                         Consultar
@@ -124,7 +124,7 @@ export const ProductCard: React.FC<Props> = ({ product, onAddToCart, dark = fals
                             e.stopPropagation();
                             onAddToCart(product);
                         }}
-                        className="w-full mt-2 h-10 bg-py-red text-paper text-[12px] font-extrabold tracking-wide uppercase hover:bg-py-red-deep transition-colors inline-flex items-center justify-center gap-2"
+                        className="press w-full mt-2 h-10 bg-py-red text-paper text-[12px] font-extrabold tracking-wide uppercase hover:bg-py-red-deep transition-colors inline-flex items-center justify-center gap-2"
                     >
                         <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.4} />
                         Agregar

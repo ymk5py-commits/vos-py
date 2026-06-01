@@ -15,6 +15,7 @@ import { BentoFeatured } from '../components/BentoFeatured';
 import { ProductRail } from '../components/ProductRail';
 import { ProductCard } from '../components/ProductCard';
 import { BrandsGrid } from '../components/BrandsGrid';
+import { Reveal } from '../components/Reveal';
 import { loadProducts, Product } from '../data/products';
 import { useStore } from '../store';
 
@@ -73,9 +74,9 @@ export default function Home() {
                             <li key={c.name} className="snap-start shrink-0">
                                 <Link
                                     to={`/catalogo?categoria=${encodeURIComponent(c.name)}`}
-                                    className="flex flex-col items-center gap-2 group w-20 md:w-24"
+                                    className="press flex flex-col items-center gap-2 group w-20 md:w-24"
                                 >
-                                    <span className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-paper-2 flex items-center justify-center group-hover:bg-py-red group-hover:text-paper transition-colors">
+                                    <span className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-paper-2 flex items-center justify-center group-hover:bg-py-red group-hover:text-paper group-hover:-translate-y-0.5 group-hover:shadow-[0_10px_22px_-12px_rgba(20,16,12,0.5)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
                                         <c.icon className="h-6 w-6 md:h-7 md:w-7" strokeWidth={1.6} />
                                     </span>
                                     <span className="text-[11px] md:text-[12px] font-semibold text-ink text-center leading-tight group-hover:text-py-red transition-colors">
@@ -149,12 +150,12 @@ export default function Home() {
                                 { icon: ShieldCheck, t: 'Garantía oficial', d: 'Cobertura directa del fabricante en todos los productos.' },
                                 { icon: Truck, t: 'Despacho nacional', d: 'Asunción y Gran Asunción en 24/48 h. Interior por courier.' },
                                 { icon: MessageCircle, t: 'Por WhatsApp', d: 'Coordinamos el pago y la entrega de manera directa.' },
-                            ].map((f) => (
-                                <div key={f.t} className="bg-paper border border-line p-5">
+                            ].map((f, i) => (
+                                <Reveal key={f.t} delay={i * 0.08} className="bg-paper border border-line p-5 hover:border-py-red/30 transition-colors">
                                     <f.icon className="h-6 w-6 text-py-red mb-3" strokeWidth={1.6} />
                                     <h3 className="text-[15px] font-bold text-ink mb-1">{f.t}</h3>
                                     <p className="text-[13px] text-ink-2 leading-relaxed">{f.d}</p>
-                                </div>
+                                </Reveal>
                             ))}
                         </div>
                     </div>

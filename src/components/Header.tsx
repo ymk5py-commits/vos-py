@@ -14,6 +14,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../store';
+import { useHeaderCollapse } from '../hooks/useScrollDirection';
 import { Logo } from './Logo';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -52,6 +53,7 @@ export const Header = ({
     const megaRef = useRef<HTMLDivElement>(null);
     const userRef = useRef<HTMLDivElement>(null);
     const { logout, lastOrder } = useStore();
+    const collapsed = useHeaderCollapse(160);
 
     useEffect(() => {
         const onDoc = (e: MouseEvent) => {
@@ -66,8 +68,8 @@ export const Header = ({
 
     return (
         <header className="sticky top-0 z-50 bg-paper border-b border-line">
-            {/* Top utility strip — red, retail PY style */}
-            <div className="bg-py-red text-paper text-[11px]">
+            {/* Top utility strip — red, retail PY style. Collapses on scroll down. */}
+            <div className={`bg-py-red text-paper text-[11px] overflow-hidden transition-[height,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'h-0 opacity-0' : 'h-8 opacity-100'}`}>
                 <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 h-8 flex items-center justify-between">
                     <span className="font-semibold tracking-wide flex items-center gap-1.5">
                         <MapPin className="h-3 w-3" /> Envíos a todo Paraguay
@@ -157,7 +159,7 @@ export const Header = ({
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-3" />
                             <button
                                 aria-label="Buscar"
-                                className="absolute right-1 top-1 bottom-1 px-5 bg-py-red text-paper text-[13px] font-bold hover:bg-py-red-deep transition-colors rounded"
+                                className="press absolute right-1 top-1 bottom-1 px-5 bg-py-red text-paper text-[13px] font-bold hover:bg-py-red-deep transition-colors rounded"
                             >
                                 Buscar
                             </button>
@@ -229,7 +231,7 @@ export const Header = ({
 
                             <button
                                 onClick={onCartClick}
-                                className="relative inline-flex items-center gap-2 px-3 h-10 bg-ink text-paper hover:bg-ink/90 rounded-md text-[13px] font-semibold"
+                                className="press relative inline-flex items-center gap-2 px-3 h-10 bg-ink text-paper hover:bg-ink/90 rounded-md text-[13px] font-semibold"
                                 aria-label="Carrito"
                             >
                                 <ShoppingBag className="h-4 w-4" strokeWidth={2} />
@@ -269,8 +271,8 @@ export const Header = ({
                 </div>
             </div>
 
-            {/* Categories bar — Nissei-style, with mega menu */}
-            <div className="hidden lg:block border-b border-line bg-paper">
+            {/* Categories bar — Nissei-style, with mega menu. Collapses on scroll down. */}
+            <div className={`hidden lg:block border-b border-line bg-paper overflow-visible transition-[height,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'lg:h-0 lg:opacity-0 lg:pointer-events-none lg:border-b-0' : 'lg:h-11 lg:opacity-100'}`}>
                 <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
                     <div className="flex items-center gap-1 h-11">
                         <div ref={megaRef} className="relative">

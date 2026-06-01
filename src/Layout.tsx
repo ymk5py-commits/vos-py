@@ -5,12 +5,14 @@
 
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { LoginModal } from './components/LoginModal';
 import { CookieBanner } from './components/CookieBanner';
 import { WhatsAppFAB } from './components/WhatsAppFAB';
+import { Toaster } from './components/Toaster';
 import { useStore } from './store';
 import { categories } from './data/products';
 
@@ -29,7 +31,7 @@ export default function Layout() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-background font-sans selection:bg-[#0038A8] selection:text-white">
+        <div className="min-h-screen flex flex-col bg-paper font-sans">
             <Header
                 cartCount={store.cartCount}
                 onLoginClick={store.openLogin}
@@ -48,7 +50,17 @@ export default function Layout() {
             />
 
             <main className="flex-1">
-                <Outlet context={{ search, setSearch }} />
+                <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                        key={loc.pathname}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                        <Outlet context={{ search, setSearch }} />
+                    </motion.div>
+                </AnimatePresence>
             </main>
 
             <Footer
@@ -70,6 +82,7 @@ export default function Layout() {
                 onLogin={store.login}
             />
             <WhatsAppFAB />
+            <Toaster />
             <CookieBanner />
         </div>
     );

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
 import { Product } from './data/products';
 
 export interface CartItem { product: Product; quantity: number; }
@@ -47,6 +47,10 @@ interface StoreCtx {
     isCartOpen: boolean;
     openCart: () => void;
     closeCart: () => void;
+
+    // Toast (add-to-cart feedback)
+    toast: { id: number; name: string } | null;
+    dismissToast: () => void;
 
     // Auth (mock)
     user: MockUser | null;
@@ -109,6 +113,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const [shipping, setShippingState] = useState<Shipping>(defaultShipping);
     const [payment, setPaymentState] = useState<PaymentId>('transferencia');
     const [orders, setOrders] = useState<Order[]>([]);
+    const [toast, setToast] = useState<{ id: number; name: string } | null>(null);
+    const toastId = useRef(0);
 
     // Hydrate from localStorage
     useEffect(() => {
@@ -153,8 +159,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             persist(CART_KEY, next);
             return next;
         });
-        if (opts?.open !== false) setCartOpen(true);
+        // Open the drawer only if explicitly requested; otherwise show a toast.
+        if (opts?.open === true) {
+            setCartOpen(true);
+        } else {
+            toastId.current += 1;
+            setToast({ id: toastId.current, name: p.name });
+        }
     }, []);
+
+    const dismissToast = useCallback(() => setToast(null), []);
 
     const updateQuantity = useCallback((id: string, delta: number) => {
         setCart((prev) => {
@@ -278,6 +292,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         <Ctx.Provider value={{
             cart, cartCount, cartTotal, addToCart, updateQuantity, setQuantity, removeFromCart, clearCart,
             isCartOpen, openCart: () => setCartOpen(true), closeCart: () => setCartOpen(false),
+            toast, dismissToast,
             user, isLoginOpen, openLogin: () => setLoginOpen(true), closeLogin: () => setLoginOpen(false),
             login, logout,
             customer, shipping, payment, setCustomer, setShipping, setPayment, resetCheckout,
