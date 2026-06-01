@@ -73,10 +73,11 @@ const BentoHero: React.FC<{ product: Product; onAdd: () => void }> = ({ product,
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative col-span-2 row-span-2 bg-paper-2 overflow-hidden group"
+            className="relative col-span-2 row-span-2 bg-paper border border-line overflow-hidden group flex flex-col"
         >
-            <Link to={`/producto/${product.id}`} className="block h-full">
-                <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10 md:p-14">
+            <Link to={`/producto/${product.id}`} className="flex flex-col h-full">
+                {/* Image area — clean, no text overlap */}
+                <div className="relative flex-1 min-h-0 flex items-center justify-center p-6 sm:p-10 md:p-12 bg-paper">
                     {err ? (
                         <span className="text-display-m text-ink-3 opacity-25">VP</span>
                     ) : (
@@ -84,37 +85,38 @@ const BentoHero: React.FC<{ product: Product; onAdd: () => void }> = ({ product,
                             src={product.image}
                             alt={product.name}
                             onError={() => setErr(true)}
-                            className="w-full h-full object-contain transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+                            className="max-w-full max-h-full object-contain transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                         />
                     )}
-                </div>
-                {/* Top label */}
-                <div className="absolute top-5 left-5 right-5 flex items-start justify-between">
-                    <span className="text-eyebrow text-ink-3 flex items-center gap-1.5">
-                        <Sparkles className="h-3 w-3" /> Pick del editor
+                    {/* Solid editor badge — high contrast */}
+                    <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 bg-ink text-paper text-[10px] font-bold uppercase tracking-[0.18em] px-2.5 py-1.5">
+                        <Sparkles className="h-3 w-3" /> Destacado
                     </span>
                     {hasDiscount && (
-                        <span className="bg-sale text-paper text-[11px] font-bold tabular px-2 py-1">
+                        <span className="absolute top-4 right-4 bg-sale text-paper text-[11px] font-extrabold tabular px-2 py-1">
                             −{product.discount}%
                         </span>
                     )}
                 </div>
-                {/* Bottom info */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 bg-gradient-to-t from-paper/95 via-paper/80 to-transparent">
-                    <p className="text-eyebrow text-ink-3 mb-1">{product.brand}</p>
-                    <h3 className="text-[15px] sm:text-title md:text-headline font-bold tracking-tight text-ink line-clamp-2 max-w-md leading-tight">{safeTitle(product.name)}</h3>
-                    <div className="flex items-end justify-between mt-2 sm:mt-3">
+
+                {/* Solid info panel — full contrast, separated from photo */}
+                <div className="shrink-0 border-t border-line bg-paper-2 p-4 sm:p-6 md:p-7">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-py-red mb-1">{product.brand}</p>
+                    <h3 className="text-[15px] sm:text-title md:text-[26px] font-extrabold tracking-tight text-ink line-clamp-2 max-w-md leading-tight">
+                        {safeTitle(product.name)}
+                    </h3>
+                    <div className="flex items-end justify-between mt-3 sm:mt-4">
                         <div>
                             {hasDiscount && (
-                                <span className="block text-[12px] line-through tabular text-ink-3">{formatGs(product.listGs)}</span>
+                                <span className="block text-[12px] line-through tabular text-ink-3 leading-none mb-0.5">{formatGs(product.listGs)}</span>
                             )}
-                            <span className={`block text-lg sm:text-2xl md:text-3xl font-bold tabular leading-none ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
+                            <span className={`block text-xl sm:text-2xl md:text-[32px] font-extrabold tabular leading-none ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
                                 {formatGs(product.priceGs)}
                             </span>
                         </div>
                         <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-                            className="h-11 w-11 sm:h-12 sm:w-12 bg-ink text-paper flex items-center justify-center hover:bg-ink/90 transition-colors shrink-0"
+                            className="press h-11 w-11 sm:h-12 sm:w-12 bg-py-red text-paper flex items-center justify-center hover:bg-py-red-deep transition-colors shrink-0"
                             aria-label={`Agregar ${product.name}`}
                         >
                             <Plus className="h-5 w-5" strokeWidth={2.4} />
@@ -135,10 +137,10 @@ const BentoProduct: React.FC<{ product: Product; onAdd: () => void }> = ({ produ
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="relative bg-paper-2 overflow-hidden group"
+            className="relative bg-paper border border-line overflow-hidden group flex flex-col"
         >
-            <Link to={`/producto/${product.id}`} className="block h-full">
-                <div className="absolute inset-0 flex items-center justify-center p-6">
+            <Link to={`/producto/${product.id}`} className="flex flex-col h-full">
+                <div className="relative flex-1 min-h-0 flex items-center justify-center p-5 bg-paper">
                     {err ? (
                         <span className="text-headline text-ink-3 opacity-30">VP</span>
                     ) : (
@@ -147,23 +149,23 @@ const BentoProduct: React.FC<{ product: Product; onAdd: () => void }> = ({ produ
                             alt={product.name}
                             loading="lazy"
                             onError={() => setErr(true)}
-                            className="w-full h-full object-contain transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                            className="max-w-full max-h-full object-contain transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
                         />
                     )}
+                    {hasDiscount && (
+                        <span className="absolute top-0 right-0 bg-sale text-paper text-[10px] font-bold tabular px-2 py-1">−{product.discount}%</span>
+                    )}
                 </div>
-                <span className="absolute top-3 left-3 text-eyebrow text-ink-3">{product.brand}</span>
-                {hasDiscount && (
-                    <span className="absolute top-0 right-0 bg-sale text-paper text-[10px] font-bold tabular px-2 py-1">−{product.discount}%</span>
-                )}
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-paper-2 via-paper-2/95 to-transparent">
+                <div className="shrink-0 border-t border-line bg-paper-2 p-3">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-ink-3 mb-0.5">{product.brand}</p>
                     <h4 className="text-[12px] font-semibold text-ink line-clamp-1 leading-tight">{safeTitle(product.name)}</h4>
-                    <div className="flex items-center justify-between mt-1">
-                        <span className={`text-[13px] font-bold tabular ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
+                    <div className="flex items-center justify-between mt-1.5">
+                        <span className={`text-[13px] font-extrabold tabular ${hasDiscount ? 'text-sale' : 'text-ink'}`}>
                             {formatGs(product.priceGs)}
                         </span>
                         <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-                            className="h-7 w-7 bg-ink text-paper flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300"
+                            className="press h-7 w-7 bg-py-red text-paper flex items-center justify-center hover:bg-py-red-deep transition-colors"
                             aria-label={`Agregar ${product.name}`}
                         >
                             <Plus className="h-3.5 w-3.5" strokeWidth={2.4} />
