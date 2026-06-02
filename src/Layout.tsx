@@ -49,7 +49,7 @@ export default function Layout() {
                 onShowHelp={() => nav('/contacto')}
             />
 
-            <main className="flex-1">
+            <main className="flex-1 relative z-0">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={loc.pathname}

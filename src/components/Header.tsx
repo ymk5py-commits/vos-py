@@ -53,7 +53,7 @@ export const Header = ({
     const megaRef = useRef<HTMLDivElement>(null);
     const userRef = useRef<HTMLDivElement>(null);
     const { logout, lastOrder } = useStore();
-    const collapsed = useHeaderCollapse(160);
+    const collapsed = useHeaderCollapse();
 
     useEffect(() => {
         const onDoc = (e: MouseEvent) => {
@@ -68,8 +68,10 @@ export const Header = ({
 
     return (
         <header className="sticky top-0 z-50 bg-paper border-b border-line">
-            {/* Top utility strip — red, retail PY style. Collapses on scroll down. */}
-            <div className={`bg-py-red text-paper text-[11px] overflow-hidden transition-[height,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'h-0 opacity-0' : 'h-8 opacity-100'}`}>
+            {/* Top utility strip — red, retail PY style. Collapses on scroll down.
+                Height-only collapse (solid, no opacity fade) so content never
+                ghosts through the bar. */}
+            <div className={`bg-py-red text-paper text-[11px] overflow-hidden transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'h-0' : 'h-8'}`}>
                 <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 h-8 flex items-center justify-between">
                     <span className="font-semibold tracking-wide flex items-center gap-1.5">
                         <MapPin className="h-3 w-3" /> Envíos a todo Paraguay
@@ -271,8 +273,10 @@ export const Header = ({
                 </div>
             </div>
 
-            {/* Categories bar — Nissei-style, with mega menu. Collapses on scroll down. */}
-            <div className={`hidden lg:block border-b border-line bg-paper overflow-visible transition-[height,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'lg:h-0 lg:opacity-0 lg:pointer-events-none lg:border-b-0' : 'lg:h-11 lg:opacity-100'}`}>
+            {/* Categories bar — Nissei-style, with mega menu. Collapses on scroll down.
+                Height-only (no opacity fade). Overflow is visible when expanded so
+                the mega-menu dropdown can escape, hidden+clipped when collapsed. */}
+            <div className={`hidden lg:block bg-paper transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'lg:h-0 lg:overflow-hidden lg:border-b-0 lg:pointer-events-none' : 'lg:h-11 lg:overflow-visible lg:border-b lg:border-line'}`}>
                 <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
                     <div className="flex items-center gap-1 h-11">
                         <div ref={megaRef} className="relative">
