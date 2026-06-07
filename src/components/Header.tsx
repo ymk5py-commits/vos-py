@@ -17,7 +17,7 @@ import { useStore } from '../store';
 import { useHeaderCollapse } from '../hooks/useScrollDirection';
 import { Logo } from './Logo';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { SearchAutocomplete } from './SearchAutocomplete';
 import {
     Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose,
 } from './ui/sheet';
@@ -29,6 +29,7 @@ interface HeaderProps {
     user: any;
     search: string;
     onSearchChange: (value: string) => void;
+    onSearchSubmit: (q: string) => void;
     categories: { name: string; icon: string }[];
     onSelectCategory: (cat: string) => void;
     onShowOffers: () => void;
@@ -44,7 +45,7 @@ const CAT_ICONS: Record<string, any> = {
 
 export const Header = ({
     cartCount, onLoginClick, onCartClick, user,
-    search, onSearchChange, categories,
+    search, onSearchChange, onSearchSubmit, categories,
     onSelectCategory, onShowOffers, onShowAbout, onShowHelp,
 }: HeaderProps) => {
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -149,27 +150,20 @@ export const Header = ({
                             <Logo />
                         </Link>
 
-                        {/* Search dominant — retail style */}
-                        <div className="flex-1 max-w-3xl hidden lg:block relative">
-                            <Input
-                                placeholder="¿Qué estás buscando? iPhone, JBL, Garmin…"
+                        {/* Search dominant — retail style with instant results */}
+                        <div className="flex-1 max-w-3xl hidden lg:block">
+                            <SearchAutocomplete
                                 value={search}
-                                onChange={(e) => onSearchChange(e.target.value)}
-                                className="h-12 pl-12 pr-32 bg-paper-2 border-transparent focus-visible:bg-paper focus-visible:border-py-red focus-visible:ring-0 rounded-md text-[14px]"
-                                maxLength={100}
+                                onChange={onSearchChange}
+                                onSubmit={onSearchSubmit}
+                                placeholder="¿Qué estás buscando? iPhone, JBL, Garmin…"
+                                variant="bar"
                             />
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-3" />
-                            <button
-                                aria-label="Buscar"
-                                className="press absolute right-1 top-1 bottom-1 px-5 bg-py-red text-paper text-[13px] font-bold hover:bg-py-red-deep transition-colors rounded"
-                            >
-                                Buscar
-                            </button>
                         </div>
 
                         {/* Actions */}
                         <div className="flex items-center gap-1 md:gap-2 ml-auto">
-                            <Button variant="ghost" size="icon" className="lg:hidden hover:bg-paper-2" onClick={() => setMobileSearchOpen((v) => !v)} aria-label="Buscar">
+                            <Button variant="ghost" size="icon" className="lg:hidden hover:bg-paper-2" onClick={() => setMobileSearchOpen((v) => !v)} aria-label={mobileSearchOpen ? 'Cerrar búsqueda' : 'Abrir búsqueda'} aria-expanded={mobileSearchOpen}>
                                 {mobileSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
                             </Button>
 
@@ -257,17 +251,15 @@ export const Header = ({
                     </div>
 
                     {mobileSearchOpen && (
-                        <div className="lg:hidden pb-3 relative">
-                            <Input
-                                autoFocus
-                                placeholder="Buscá productos…"
+                        <div className="lg:hidden pb-3">
+                            <SearchAutocomplete
                                 value={search}
-                                onChange={(e) => onSearchChange(e.target.value)}
-                                className="h-11 pl-11 pr-20 bg-paper-2 border-transparent focus-visible:bg-paper focus-visible:border-py-red focus-visible:ring-0 rounded-md text-[14px]"
-                                maxLength={100}
+                                onChange={onSearchChange}
+                                onSubmit={(q) => { setMobileSearchOpen(false); onSearchSubmit(q); }}
+                                placeholder="Buscá productos…"
+                                autoFocus
+                                variant="plain"
                             />
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 -mt-1.5 h-4 w-4 text-ink-3" />
-                            <button className="absolute right-1 top-1 bottom-4 px-4 bg-py-red text-paper text-[12px] font-bold rounded">Buscar</button>
                         </div>
                     )}
                 </div>

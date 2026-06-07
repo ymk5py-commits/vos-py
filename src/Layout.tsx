@@ -38,10 +38,8 @@ export default function Layout() {
                 onCartClick={store.openCart}
                 user={store.user}
                 search={search}
-                onSearchChange={(v) => {
-                    setSearch(v);
-                    if (v.trim()) goCatalog({ q: v });
-                }}
+                onSearchChange={setSearch}
+                onSearchSubmit={(q) => goCatalog({ q })}
                 categories={categories}
                 onSelectCategory={(c) => c === 'all' ? goCatalog() : goCatalog({ categoria: c })}
                 onShowOffers={() => goCatalog({ ofertas: '1' })}
