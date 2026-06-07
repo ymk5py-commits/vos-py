@@ -4,12 +4,17 @@
  */
 
 import { motion } from 'motion/react';
+import { CountUp } from './CountUp';
 
-const stats = [
-    { value: '1.784', label: 'Productos' },
-    { value: '80+',   label: 'Marcas' },
-    { value: '24/48h', label: 'Despacho' },
-    { value: '100%',  label: 'Garantía oficial' },
+type Stat =
+    | { kind: 'count'; to: number; thousands?: boolean; suffix?: string; label: string }
+    | { kind: 'static'; value: string; label: string };
+
+const stats: Stat[] = [
+    { kind: 'count', to: 1784, thousands: true, label: 'Productos' },
+    { kind: 'count', to: 80, suffix: '+', label: 'Marcas' },
+    { kind: 'static', value: '24/48h', label: 'Despacho' },
+    { kind: 'count', to: 100, suffix: '%', label: 'Garantía oficial' },
 ];
 
 const principles = [
@@ -57,7 +62,11 @@ export const About = () => {
                             {stats.map((s) => (
                                 <div key={s.label}>
                                     <dt className="text-eyebrow text-ink-3 mb-2">{s.label}</dt>
-                                    <dd className="text-[40px] font-bold tabular text-ink leading-none">{s.value}</dd>
+                                    <dd className="text-[40px] font-bold tabular text-ink leading-none">
+                                        {s.kind === 'count'
+                                            ? <CountUp to={s.to} thousands={s.thousands} suffix={s.suffix} />
+                                            : s.value}
+                                    </dd>
                                 </div>
                             ))}
                         </dl>

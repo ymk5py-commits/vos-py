@@ -74,6 +74,10 @@ interface StoreCtx {
     lastOrder: Order | null;
     createOrder: () => Order;
     getOrder: (id: string) => Order | undefined;
+
+    // Recently viewed
+    recentIds: string[];
+    recordView: (id: string) => void;
 }
 
 const Ctx = createContext<StoreCtx | null>(null);
@@ -82,6 +86,7 @@ const CART_KEY = 'vospy_cart_v3';
 const USER_KEY = 'vospy_user_v2';
 const CHECKOUT_KEY = 'vospy_checkout_v1';
 const ORDERS_KEY = 'vospy_orders_v1';
+const RECENT_KEY = 'vospy_recent_v1';
 const USER_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 const defaultCustomer = (): Customer => ({ name: '', email: '', phone: '', document: '' });
@@ -115,6 +120,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [toast, setToast] = useState<{ id: number; name: string } | null>(null);
     const toastId = useRef(0);
+    const [recentIds, setRecentIds] = useState<string[]>([]);
 
     // Hydrate from localStorage
     useEffect(() => {
@@ -131,6 +137,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
         const o = load<Order[]>(ORDERS_KEY);
         if (Array.isArray(o)) setOrders(o);
+        const r = load<string[]>(RECENT_KEY);
+        if (Array.isArray(r)) setRecentIds(r);
     }, []);
 
     // Prefill customer when user logs in
@@ -169,6 +177,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const dismissToast = useCallback(() => setToast(null), []);
+
+    const recordView = useCallback((id: string) => {
+        setRecentIds((prev) => {
+            const next = [id, ...prev.filter((x) => x !== id)].slice(0, 12);
+            persist(RECENT_KEY, next);
+            return next;
+        });
+    }, []);
 
     const updateQuantity = useCallback((id: string, delta: number) => {
         setCart((prev) => {
@@ -297,6 +313,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             login, logout,
             customer, shipping, payment, setCustomer, setShipping, setPayment, resetCheckout,
             orders, lastOrder, createOrder, getOrder,
+            recentIds, recordView,
         }}>
             {children}
         </Ctx.Provider>

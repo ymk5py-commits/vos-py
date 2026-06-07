@@ -67,6 +67,14 @@ export const BentoFeatured: React.FC<Props> = ({ products }) => {
 const BentoHero: React.FC<{ product: Product; onAdd: () => void }> = ({ product, onAdd }) => {
     const [err, setErr] = useState(false);
     const hasDiscount = product.discount > 0 && product.listGs > product.priceGs;
+
+    // Cursor-follow spotlight (sets CSS vars on the plate).
+    const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+        e.currentTarget.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
@@ -76,8 +84,17 @@ const BentoHero: React.FC<{ product: Product; onAdd: () => void }> = ({ product,
             className="relative col-span-2 row-span-2 bg-paper border border-line overflow-hidden group flex flex-col"
         >
             <Link to={`/producto/${product.id}`} className="flex flex-col h-full">
-                {/* Image area — clean, no text overlap */}
-                <div className="relative flex-1 min-h-0 flex items-center justify-center p-6 sm:p-10 md:p-12 bg-paper">
+                {/* Image area — clean, no text overlap, cursor spotlight */}
+                <div
+                    onMouseMove={onMove}
+                    className="relative flex-1 min-h-0 flex items-center justify-center p-6 sm:p-10 md:p-12 bg-paper [--mx:50%] [--my:40%]"
+                >
+                    {/* Spotlight overlay — only visible on hover */}
+                    <div
+                        aria-hidden="true"
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                        style={{ background: 'radial-gradient(380px circle at var(--mx) var(--my), color-mix(in oklch, var(--color-py-red) 9%, transparent), transparent 70%)' }}
+                    />
                     {err ? (
                         <span className="text-display-m text-ink-3 opacity-25">VP</span>
                     ) : (

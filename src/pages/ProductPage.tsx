@@ -5,11 +5,12 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
-    ShoppingCart, Minus, Plus, ChevronRight, ShieldCheck, Truck, RefreshCw, ArrowLeft, MessageCircle,
+    ShoppingCart, Minus, Plus, ChevronRight, ShieldCheck, Truck, RefreshCw, ArrowLeft, MessageCircle, ZoomIn, X,
 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
+import { RecentlyViewed } from '../components/RecentlyViewed';
 import { loadProducts, Product, formatGs } from '../data/products';
 import { useStore } from '../store';
 
@@ -21,15 +22,19 @@ const safe = (s: string, n = 200) => s.replace(/[\r\n<>]/g, '').slice(0, n);
 export default function ProductPage() {
     const { id } = useParams<{ id: string }>();
     const nav = useNavigate();
-    const { addToCart } = useStore();
+    const { addToCart, recordView } = useStore();
     const [products, setProducts] = useState<Product[]>([]);
     const [qty, setQty] = useState(1);
     const [imgError, setImgError] = useState(false);
+    const [zoomOpen, setZoomOpen] = useState(false);
 
     useEffect(() => { loadProducts().then(setProducts); }, []);
-    useEffect(() => { setQty(1); setImgError(false); }, [id]);
+    useEffect(() => { setQty(1); setImgError(false); setZoomOpen(false); }, [id]);
 
     const product = products.find((p) => p.id === id);
+
+    // Record this product as recently viewed.
+    useEffect(() => { if (product) recordView(product.id); }, [product, recordView]);
 
     useEffect(() => {
         if (!product) return;
@@ -112,9 +117,14 @@ export default function ProductPage() {
                 </nav>
 
                 <div className="grid md:grid-cols-2 gap-x-12 gap-y-12 lg:gap-x-20">
-                    {/* Image — bleeds to its plate, sticky on desktop */}
+                    {/* Image — bleeds to its plate, sticky on desktop, click to zoom */}
                     <div className="md:sticky md:top-32 md:self-start">
-                        <div className="relative aspect-square bg-paper-2">
+                        <button
+                            type="button"
+                            onClick={() => !imgError && setZoomOpen(true)}
+                            className="group relative aspect-square bg-paper-2 w-full block overflow-hidden cursor-zoom-in"
+                            aria-label="Ampliar imagen"
+                        >
                             {imgError ? (
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <span className="text-display-m text-ink-3 opacity-30">VP</span>
@@ -128,15 +138,20 @@ export default function ProductPage() {
                                     src={product.image}
                                     alt={product.name}
                                     onError={() => setImgError(true)}
-                                    className="absolute inset-0 w-full h-full object-contain p-10 md:p-16"
+                                    className="absolute inset-0 w-full h-full object-contain p-10 md:p-16 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                                 />
+                            )}
+                            {!imgError && (
+                                <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 bg-ink/80 text-paper text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <ZoomIn className="h-3 w-3" /> Ampliar
+                                </span>
                             )}
                             {hasDiscount && (
                                 <span className="absolute top-0 right-0 bg-sale text-paper text-[12px] font-bold tabular px-3 py-2">
                                     −{product.discount}%
                                 </span>
                             )}
-                        </div>
+                        </button>
                     </div>
 
                     {/* Info column */}
@@ -290,6 +305,43 @@ export default function ProductPage() {
                     </button>
                 </div>
             </div>
+
+            {/* Recently viewed */}
+            <RecentlyViewed excludeId={product.id} />
+
+            {/* Zoom lightbox */}
+            <AnimatePresence>
+                {zoomOpen && !imgError && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 z-[80] bg-ink/90 backdrop-blur-sm flex items-center justify-center p-6 cursor-zoom-out"
+                        onClick={() => setZoomOpen(false)}
+                        role="dialog"
+                        aria-label="Imagen ampliada"
+                    >
+                        <button
+                            onClick={() => setZoomOpen(false)}
+                            aria-label="Cerrar"
+                            className="absolute top-5 right-5 h-11 w-11 flex items-center justify-center text-paper/80 hover:text-paper"
+                        >
+                            <X className="h-6 w-6" />
+                        </button>
+                        <motion.img
+                            initial={{ scale: 0.92, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.92, opacity: 0 }}
+                            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                            src={product.image}
+                            alt={product.name}
+                            className="max-w-full max-h-full object-contain"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Mobile sticky bar */}
             <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-paper border-t border-line shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.15)]">

@@ -51,20 +51,28 @@ export default function Contact() {
             </div>
 
             <div className="mt-10 grid md:grid-cols-3 gap-6">
-                <div className="rounded-2xl border p-6">
-                    <MapPin className="h-6 w-6 text-[#0038A8] mb-3" />
-                    <h3 className="font-bold mb-1">Dirección</h3>
-                    <p className="text-sm text-muted-foreground">Asunción, Paraguay</p>
+                <div className="border border-line p-6 flex flex-col">
+                    <MapPin className="h-6 w-6 text-py-red mb-3" strokeWidth={1.8} />
+                    <h3 className="font-bold mb-1 text-ink">Sucursal</h3>
+                    <p className="text-sm text-ink-2">Asunción, Paraguay</p>
+                    <a
+                        href="https://www.google.com/maps/search/?api=1&query=Asunci%C3%B3n%2C+Paraguay"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold link-underline w-fit"
+                    >
+                        Cómo llegar <ChevronRight className="h-3.5 w-3.5" />
+                    </a>
                 </div>
-                <div className="rounded-2xl border p-6">
-                    <Phone className="h-6 w-6 text-[#0038A8] mb-3" />
-                    <h3 className="font-bold mb-1">Teléfono</h3>
-                    <p className="text-sm text-muted-foreground">+595 21 000 000</p>
+                <div className="border border-line p-6">
+                    <Phone className="h-6 w-6 text-py-red mb-3" strokeWidth={1.8} />
+                    <h3 className="font-bold mb-1 text-ink">Teléfono</h3>
+                    <a href="tel:+59521000000" className="text-sm text-ink-2 hover:text-ink tabular">+595 21 000 000</a>
                 </div>
-                <div className="rounded-2xl border p-6">
-                    <Clock className="h-6 w-6 text-[#0038A8] mb-3" />
-                    <h3 className="font-bold mb-1">Horario</h3>
-                    <p className="text-sm text-muted-foreground">Lun. a Sáb. 9:00 a 18:00 hs.</p>
+                <div className="border border-line p-6">
+                    <Clock className="h-6 w-6 text-py-red mb-3" strokeWidth={1.8} />
+                    <h3 className="font-bold mb-1 text-ink">Horario</h3>
+                    <p className="text-sm text-ink-2">Lun. a Sáb. 9:00 a 18:00 hs.</p>
                 </div>
             </div>
 
