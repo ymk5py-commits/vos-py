@@ -15,6 +15,7 @@ import { BentoFeatured } from '../components/BentoFeatured';
 import { ProductRail } from '../components/ProductRail';
 import { ProductCard } from '../components/ProductCard';
 import { BrandsGrid } from '../components/BrandsGrid';
+import { Testimonials } from '../components/Testimonials';
 import { Reveal } from '../components/Reveal';
 import { loadProducts, Product } from '../data/products';
 import { useStore } from '../store';
@@ -134,6 +135,9 @@ export default function Home() {
                     </div>
                 );
             })}
+
+            {/* Social proof — testimonials marquee */}
+            <Testimonials />
 
             {/* Promise / trust */}
             <section className="bg-paper-2/60">

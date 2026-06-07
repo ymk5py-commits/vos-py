@@ -134,6 +134,12 @@
 }
 .animate-marquee:hover { animation-play-state: paused; }
 
+/* Bidirectional review marquees */
+@keyframes marquee-l { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes marquee-r { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+.animate-marquee-l { animation: marquee-l 48s linear infinite; width: max-content; }
+.animate-marquee-r { animation: marquee-r 48s linear infinite; width: max-content; }
+
 /* Stagger reveal */
 @keyframes rise {
   from { opacity: 0; transform: translateY(20px); }
@@ -144,6 +150,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee, .rise-in { animation: none; }
+  .animate-marquee, .animate-marquee-l, .animate-marquee-r, .rise-in { animation: none; }
   html { scroll-behavior: auto; }
 }
