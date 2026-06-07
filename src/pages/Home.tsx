@@ -19,6 +19,7 @@ import { Testimonials } from '../components/Testimonials';
 import { Reveal } from '../components/Reveal';
 import { loadProducts, Product } from '../data/products';
 import { useStore } from '../store';
+import { useSeo } from '../lib/seo';
 
 const CATS = [
     { name: 'Audio', icon: Headphones },
@@ -34,6 +35,7 @@ const CATS = [
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
     const { addToCart } = useStore();
+    useSeo({ canonicalPath: '/' });
 
     useEffect(() => { loadProducts().then(setProducts); }, []);
 

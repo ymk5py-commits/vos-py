@@ -10,6 +10,7 @@ import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/button';
 import { loadProducts, Product } from '../data/products';
 import { useStore } from '../store';
+import { useSeo } from '../lib/seo';
 
 const PAGE_SIZE = 24;
 
@@ -65,6 +66,28 @@ export default function Catalog() {
             : q
                 ? `Resultados para "${q}"`
                 : 'Catálogo completo';
+
+    const seoTitle = onlyOffers
+        ? 'Ofertas y descuentos | Vos PY'
+        : category !== 'all'
+            ? `${category} | Vos PY`
+            : brand !== 'all'
+                ? `${brand} | Vos PY`
+                : q
+                    ? `Buscar "${q}" | Vos PY`
+                    : 'Catálogo completo · +1.700 productos | Vos PY';
+    const seoDesc = category !== 'all'
+        ? `Comprá ${category} en Vos PY: marcas originales, precios en guaraníes, garantía oficial y envíos a todo Paraguay.`
+        : onlyOffers
+            ? 'Ofertas vigentes en electrónica importada: audio, celulares, gaming y más, con descuentos reales en guaraníes.'
+            : undefined;
+    // Canonical sin query de búsqueda (q) para no fragmentar la indexación.
+    const canonicalPath = onlyOffers
+        ? '/catalogo?ofertas=1'
+        : category !== 'all'
+            ? `/catalogo?categoria=${encodeURIComponent(category)}`
+            : '/catalogo';
+    useSeo({ title: seoTitle, description: seoDesc, canonicalPath, noindex: Boolean(q) });
 
     return (
         <section className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 py-12 md:py-16">

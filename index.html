@@ -36,14 +36,25 @@
       "@type": "OnlineStore",
       "name": "Vos PY",
       "url": "https://vos-py.vercel.app/",
+      "logo": "https://vos-py.vercel.app/logo.png",
+      "image": "https://vos-py.vercel.app/logo.png",
       "description": "Tienda online de electrónica importada en Paraguay con más de 1.700 productos: audio, celulares, gaming, smartwatches y accesorios.",
       "areaServed": { "@type": "Country", "name": "Paraguay" },
       "currenciesAccepted": "PYG",
+      "paymentAccepted": "Transferencia bancaria, Billetera digital, Efectivo",
+      "priceRange": "₲₲",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Asunción",
         "addressCountry": "PY"
-      }
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "availableLanguage": ["es"],
+        "areaServed": "PY"
+      },
+      "sameAs": ["https://www.instagram.com/vos.py"]
     }
     </script>
     <script type="application/ld+json">
@@ -52,7 +63,12 @@
       "@type": "WebSite",
       "name": "Vos PY",
       "url": "https://vos-py.vercel.app/",
-      "inLanguage": "es-PY"
+      "inLanguage": "es-PY",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": { "@type": "EntryPoint", "urlTemplate": "https://vos-py.vercel.app/catalogo?q={search_term_string}" },
+        "query-input": "required name=search_term_string"
+      }
     }
     </script>
   </head>

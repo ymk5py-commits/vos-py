@@ -159,5 +159,44 @@ export const categories: { name: string; icon: string }[] = ${JSON.stringify(cat
 `;
 writeFileSync(join(ROOT, 'src', 'data', 'categories.ts'), ts);
 
+// ---- Sitemap -------------------------------------------------------------
+const ORIGIN = 'https://vos-py.vercel.app';
+const today = new Date().toISOString().slice(0, 10);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+
+const urls = [];
+const add = (loc, { priority = 0.5, changefreq = 'weekly', lastmod = today } = {}) =>
+    urls.push({ loc, priority, changefreq, lastmod });
+
+// Static pages
+add(`${ORIGIN}/`, { priority: 1.0, changefreq: 'daily' });
+add(`${ORIGIN}/catalogo`, { priority: 0.9, changefreq: 'daily' });
+add(`${ORIGIN}/nosotros`, { priority: 0.5, changefreq: 'monthly' });
+add(`${ORIGIN}/contacto`, { priority: 0.5, changefreq: 'monthly' });
+for (const p of ['terminos', 'privacidad', 'cookies', 'devoluciones', 'envios', 'garantia']) {
+    add(`${ORIGIN}/${p}`, { priority: 0.3, changefreq: 'yearly' });
+}
+// Category pages
+for (const c of catList) {
+    add(`${ORIGIN}/catalogo?categoria=${encodeURIComponent(c.name)}`, { priority: 0.8, changefreq: 'daily' });
+}
+// All product pages
+for (const p of products) {
+    add(`${ORIGIN}/producto/${p.id}`, { priority: 0.7, changefreq: 'weekly' });
+}
+
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map((u) => `  <url>
+    <loc>${esc(u.loc)}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority.toFixed(1)}</priority>
+  </url>`).join('\n')}
+</urlset>
+`;
+writeFileSync(join(ROOT, 'public', 'sitemap.xml'), sitemap);
+
 console.log(`Wrote ${products.length} products.`);
 console.log('Categories:', catCount);
+console.log(`Wrote sitemap with ${urls.length} URLs.`);

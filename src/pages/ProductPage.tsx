@@ -13,6 +13,7 @@ import { ProductCard } from '../components/ProductCard';
 import { RecentlyViewed } from '../components/RecentlyViewed';
 import { loadProducts, Product, formatGs } from '../data/products';
 import { useStore } from '../store';
+import { useSeo } from '../lib/seo';
 
 const formatUsd2 = (v: number) =>
     `U$ ${v.toLocaleString('es-PY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -36,36 +37,62 @@ export default function ProductPage() {
     // Record this product as recently viewed.
     useEffect(() => { if (product) recordView(product.id); }, [product, recordView]);
 
+    // Per-route SEO (title, description, OG with the real product image).
+    useSeo(product
+        ? {
+            title: `${product.name} · ${product.brand} | Vos PY`,
+            description: (product.description || `${product.name} disponible en Vos PY, Paraguay.`).slice(0, 160),
+            canonicalPath: `/producto/${product.id}`,
+            image: product.image,
+            type: 'product',
+        }
+        : { title: 'Producto · Vos PY', canonicalPath: `/producto/${id}` });
+
+    // Structured data: Product + BreadcrumbList (title/meta handled by useSeo).
     useEffect(() => {
         if (!product) return;
-        const ld = {
+        const base = 'https://vos-py.vercel.app';
+        const graph = {
             '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            description: product.fullDescription || product.description,
-            brand: { '@type': 'Brand', name: product.brand },
-            sku: product.codigo || product.id,
-            image: product.image,
-            offers: {
-                '@type': 'Offer',
-                priceCurrency: 'PYG',
-                price: product.priceGs,
-                availability: (product.stock || 0) > 0
-                    ? 'https://schema.org/InStock'
-                    : 'https://schema.org/OutOfStock',
-                url: `https://vos-py.vercel.app/producto/${product.id}`,
-            },
+            '@graph': [
+                {
+                    '@type': 'Product',
+                    name: product.name,
+                    description: product.fullDescription || product.description,
+                    brand: { '@type': 'Brand', name: product.brand },
+                    category: product.category,
+                    sku: product.codigo || product.id,
+                    image: product.image,
+                    ...(product.priceGs > 0 ? {
+                        offers: {
+                            '@type': 'Offer',
+                            priceCurrency: 'PYG',
+                            price: product.priceGs,
+                            availability: (product.stock || 0) > 0
+                                ? 'https://schema.org/InStock'
+                                : 'https://schema.org/OutOfStock',
+                            url: `${base}/producto/${product.id}`,
+                            seller: { '@type': 'Organization', name: 'Vos PY' },
+                        },
+                    } : {}),
+                },
+                {
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${base}/` },
+                        { '@type': 'ListItem', position: 2, name: 'Catálogo', item: `${base}/catalogo` },
+                        { '@type': 'ListItem', position: 3, name: product.category, item: `${base}/catalogo?categoria=${encodeURIComponent(product.category)}` },
+                        { '@type': 'ListItem', position: 4, name: product.name, item: `${base}/producto/${product.id}` },
+                    ],
+                },
+            ],
         };
         const s = document.createElement('script');
         s.type = 'application/ld+json';
-        s.text = JSON.stringify(ld);
+        s.text = JSON.stringify(graph);
         s.id = 'product-jsonld';
         document.head.appendChild(s);
-        document.title = `${product.name} · Vos PY`;
-        return () => {
-            document.getElementById('product-jsonld')?.remove();
-            document.title = 'Vos PY · Tienda de electrónica importada en Paraguay';
-        };
+        return () => { document.getElementById('product-jsonld')?.remove(); };
     }, [product]);
 
     if (products.length === 0) {

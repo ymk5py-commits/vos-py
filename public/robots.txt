@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /products.json
+Disallow: /products-extra.json
+Disallow: /checkout
+Disallow: /orden/
+Disallow: /*?q=
 
 Sitemap: https://vos-py.vercel.app/sitemap.xml

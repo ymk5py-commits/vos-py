@@ -5,8 +5,13 @@
 
 import { Link } from 'react-router-dom';
 import { MessageCircle, Mail, MapPin, Phone, ChevronRight, Clock } from 'lucide-react';
+import { useSeo } from '../lib/seo';
 
 export default function Contact() {
+    useSeo({
+        title: 'Contacto y sucursales · Vos PY',
+        description: 'Contactanos por WhatsApp, email o pasá por nuestra sucursal en Asunción. Atención de lunes a sábado.',
+    });
     return (
         <section className="container mx-auto px-4 py-10 md:py-16">
             <nav className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#0038A8]/70 mb-6">

@@ -6,6 +6,7 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { useSeo } from '../lib/seo';
 
 const links = [
     { to: '/terminos', label: 'Términos y Condiciones' },
@@ -17,6 +18,7 @@ const links = [
 ];
 
 export const LegalLayout = ({ title, children }: { title: string; children: ReactNode }) => {
+    useSeo({ title: `${title} · Vos PY`, description: `${title} de Vos PY, tienda de electrónica importada en Paraguay.` });
     return (
         <article className="container mx-auto px-4 py-10 md:py-16">
             <nav className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#0038A8]/70 mb-6">
