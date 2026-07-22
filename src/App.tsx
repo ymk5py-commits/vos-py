@@ -16,11 +16,11 @@ import { Terms, Privacy, Cookies, Returns, Shipping, Warranty } from './pages/Le
 import { Link } from 'react-router-dom';
 
 const NotFound = () => (
-  <div className="container mx-auto px-4 py-24 text-center">
-    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D52B1E] mb-3">Error 404</p>
-    <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">No encontramos esa página</h1>
-    <p className="text-muted-foreground mb-8">La URL no existe o el contenido fue removido.</p>
-    <Link to="/" className="inline-block bg-[#0038A8] hover:bg-[#002b80] text-white rounded-full px-8 h-12 leading-[3rem] font-bold">
+  <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-24 md:py-32 text-center">
+    <p className="text-eyebrow text-py-red mb-3">Error 404</p>
+    <h1 className="text-display-m text-ink mb-4">No encontramos esa página</h1>
+    <p className="text-ink-2 mb-8">La URL no existe o el contenido fue removido.</p>
+    <Link to="/" className="press inline-flex items-center bg-ink hover:bg-ink/90 text-paper px-8 h-12 font-semibold text-[14px] transition-colors">
       Volver al inicio
     </Link>
   </div>

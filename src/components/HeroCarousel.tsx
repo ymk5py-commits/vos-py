@@ -204,8 +204,8 @@ const SlideView = ({ slide }: { slide: Slide }) => {
     // Mobile: text is always over the image with dark gradient → paper.
     // Desktop: text panel matches bg (paper on light, paper on dark).
     const txt        = isDark ? 'text-paper' : 'text-paper lg:text-ink';
-    const txtMuted   = isDark ? 'text-paper/85' : 'text-paper/90 lg:text-ink-2';
-    const txtEyebrow = isDark ? 'text-paper/70' : 'text-paper/80 lg:text-ink-3';
+    const txtMuted   = isDark ? 'text-paper/95' : 'text-paper/95 lg:text-ink-2';
+    const txtEyebrow = isDark ? 'text-paper/80' : 'text-paper/90 lg:text-ink-3';
     const reverse = slide.side === 'right';
 
     return (

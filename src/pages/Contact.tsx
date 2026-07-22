@@ -14,15 +14,15 @@ export default function Contact() {
     });
     return (
         <section className="container mx-auto px-4 py-10 md:py-16">
-            <nav className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#0038A8]/70 mb-6">
-                <Link to="/" className="hover:text-[#0038A8]">Inicio</Link>
+            <nav className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-ink-3 mb-6">
+                <Link to="/" className="hover:text-ink">Inicio</Link>
                 <ChevronRight className="h-3 w-3" />
-                <span className="text-[#0038A8]">Contacto</span>
+                <span className="text-ink">Contacto</span>
             </nav>
             <div className="max-w-3xl">
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D52B1E]">Ayuda</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-py-red">Ayuda</span>
                 <h1 className="text-3xl md:text-5xl font-black tracking-tight mt-1 mb-4">Hablemos</h1>
-                <p className="text-lg text-muted-foreground mb-10">
+                <p className="text-lg text-ink-2 mb-10">
                     El canal más rápido es WhatsApp. También podés escribirnos por correo o pasar
                     por nuestras oficinas en Asunción.
                 </p>
@@ -44,7 +44,7 @@ export default function Contact() {
                 </a>
                 <a
                     href="mailto:contacto@vospy.com.py"
-                    className="rounded-3xl bg-zinc-950 text-white p-8 hover:bg-zinc-800 transition-colors group"
+                    className="rounded-3xl bg-ink text-paper p-8 hover:bg-ink/90 transition-colors group"
                 >
                     <Mail className="h-9 w-9 mb-4" />
                     <h2 className="text-2xl font-black mb-2">Email</h2>
@@ -81,11 +81,11 @@ export default function Contact() {
                 </div>
             </div>
 
-            <div className="mt-10 text-sm text-muted-foreground">
+            <div className="mt-10 text-sm text-ink-2">
                 ¿Buscás información legal? Consultá nuestras políticas de
-                {' '}<Link to="/devoluciones" className="text-[#0038A8] font-semibold">Devoluciones</Link>,
-                {' '}<Link to="/envios" className="text-[#0038A8] font-semibold">Envíos</Link> y
-                {' '}<Link to="/garantia" className="text-[#0038A8] font-semibold">Garantía</Link>.
+                {' '}<Link to="/devoluciones" className="text-ink font-semibold">Devoluciones</Link>,
+                {' '}<Link to="/envios" className="text-ink font-semibold">Envíos</Link> y
+                {' '}<Link to="/garantia" className="text-ink font-semibold">Garantía</Link>.
             </div>
         </section>
     );

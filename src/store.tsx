@@ -159,11 +159,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const addToCart = useCallback((p: Product, q = 1, opts?: { open?: boolean }) => {
+        // Cap quantity at available stock (client-side guard; the server must
+        // re-validate against live inventory once a backend exists).
+        const max = p.stock && p.stock > 0 ? p.stock : 99;
         setCart((prev) => {
             const i = prev.findIndex((it) => it.product.id === p.id);
             const next = i > -1
-                ? prev.map((it, idx) => idx === i ? { ...it, quantity: it.quantity + q } : it)
-                : [...prev, { product: p, quantity: q }];
+                ? prev.map((it, idx) => idx === i ? { ...it, quantity: Math.min(max, it.quantity + q) } : it)
+                : [...prev, { product: p, quantity: Math.min(max, q) }];
             persist(CART_KEY, next);
             return next;
         });
@@ -188,10 +191,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     const updateQuantity = useCallback((id: string, delta: number) => {
         setCart((prev) => {
-            const next = prev.map((it) => it.product.id === id
-                ? { ...it, quantity: Math.max(1, it.quantity + delta) }
-                : it
-            );
+            const next = prev.map((it) => {
+                if (it.product.id !== id) return it;
+                const max = it.product.stock && it.product.stock > 0 ? it.product.stock : 99;
+                return { ...it, quantity: Math.max(1, Math.min(max, it.quantity + delta)) };
+            });
             persist(CART_KEY, next);
             return next;
         });

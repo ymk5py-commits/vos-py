@@ -98,7 +98,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                                                 <button
                                                     onClick={() => onRemoveItem(item.product.id)}
                                                     aria-label="Quitar del carrito"
-                                                    className="h-8 w-8 shrink-0 flex items-center justify-center text-ink-3 hover:text-py-red"
+                                                    className="h-10 w-10 -m-1 shrink-0 flex items-center justify-center text-ink-3 hover:text-py-red"
                                                 >
                                                     <Trash2 className="h-4 w-4" strokeWidth={1.6} />
                                                 </button>
@@ -107,16 +107,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                                                 <div className="flex items-center border border-line">
                                                     <button
                                                         onClick={() => onUpdateQuantity(item.product.id, -1)}
-                                                        aria-label="Disminuir"
-                                                        className="h-9 w-9 flex items-center justify-center hover:bg-paper-2"
+                                                        aria-label="Disminuir cantidad"
+                                                        className="h-11 w-11 flex items-center justify-center hover:bg-paper-2"
                                                     >
                                                         <Minus className="h-3.5 w-3.5" strokeWidth={2} />
                                                     </button>
                                                     <span className="w-9 text-center text-[13px] font-semibold tabular">{item.quantity}</span>
                                                     <button
                                                         onClick={() => onUpdateQuantity(item.product.id, 1)}
-                                                        aria-label="Aumentar"
-                                                        className="h-9 w-9 flex items-center justify-center hover:bg-paper-2"
+                                                        aria-label="Aumentar cantidad"
+                                                        className="h-11 w-11 flex items-center justify-center hover:bg-paper-2"
                                                     >
                                                         <Plus className="h-3.5 w-3.5" strokeWidth={2} />
                                                     </button>

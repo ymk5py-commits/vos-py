@@ -105,10 +105,15 @@ export const SearchAutocomplete = ({ value, onChange, onSubmit, placeholder, aut
                 maxLength={80}
                 aria-label="Buscar productos"
                 aria-autocomplete="list"
+                aria-controls="search-listbox"
+                aria-activedescendant={active >= 0 ? `search-opt-${active}` : undefined}
                 className={`w-full bg-paper-2 border border-transparent focus:bg-paper focus:border-py-red focus:outline-none text-[14px] rounded-md text-ink placeholder:text-ink-3 ${
                     variant === 'bar' ? 'h-12 pl-12 pr-28' : 'h-11 pl-11 pr-10'
                 }`}
             />
+            <span className="sr-only" aria-live="polite">
+                {showDrop ? (results.length === 0 ? 'Sin resultados' : `${results.length} resultados`) : ''}
+            </span>
             <Search className={`absolute top-1/2 -translate-y-1/2 h-4 w-4 text-ink-3 pointer-events-none ${variant === 'bar' ? 'left-4' : 'left-4'}`} />
 
             {value && (
@@ -137,6 +142,8 @@ export const SearchAutocomplete = ({ value, onChange, onSubmit, placeholder, aut
             {showDrop && (
                 <div
                     role="listbox"
+                    id="search-listbox"
+                    aria-label="Resultados de búsqueda"
                     className="absolute left-0 right-0 top-[calc(100%+8px)] bg-paper border border-line shadow-2xl z-50 overflow-hidden"
                 >
                     {results.length === 0 ? (

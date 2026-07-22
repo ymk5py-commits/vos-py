@@ -9,12 +9,28 @@ function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
 }
 
-function SheetTrigger({ ...props }: SheetPrimitive.Trigger.Props) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+type AsChildProps = { asChild?: boolean }
+
+/**
+ * Translate the Radix-style `asChild` API to Base UI's `render` prop.
+ * Without this, `asChild` was silently ignored and Base UI rendered its own
+ * <button> around our children — nested buttons (invalid HTML, a11y bug).
+ */
+function withAsChild<P extends { render?: any; children?: React.ReactNode }>(
+  { asChild, children, ...props }: P & AsChildProps
+): P {
+  if (asChild && React.isValidElement(children)) {
+    return { ...(props as P), render: children }
+  }
+  return { ...(props as P), children }
 }
 
-function SheetClose({ ...props }: SheetPrimitive.Close.Props) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+function SheetTrigger(props: SheetPrimitive.Trigger.Props & AsChildProps) {
+  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...withAsChild(props)} />
+}
+
+function SheetClose(props: SheetPrimitive.Close.Props & AsChildProps) {
+  return <SheetPrimitive.Close data-slot="sheet-close" {...withAsChild(props)} />
 }
 
 function SheetPortal({ ...props }: SheetPrimitive.Portal.Props) {

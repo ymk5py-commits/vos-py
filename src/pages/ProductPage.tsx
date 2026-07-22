@@ -228,12 +228,20 @@ export default function ProductPage() {
                                         <Minus className="h-4 w-4" strokeWidth={2} />
                                     </button>
                                     <span className="w-10 text-center font-semibold tabular text-[14px]">{qty}</span>
-                                    <button onClick={() => setQty((q) => q + 1)} className="h-10 w-10 flex items-center justify-center hover:bg-paper-2 transition-colors" aria-label="Aumentar cantidad">
+                                    <button
+                                        onClick={() => setQty((q) => Math.min(product.stock && product.stock > 0 ? product.stock : 99, q + 1))}
+                                        disabled={product.stock !== undefined && qty >= product.stock}
+                                        className="h-10 w-10 flex items-center justify-center hover:bg-paper-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                        aria-label="Aumentar cantidad"
+                                    >
                                         <Plus className="h-4 w-4" strokeWidth={2} />
                                     </button>
                                 </div>
                                 {product.stock !== undefined && (
-                                    <span className="text-[12px] text-ink-2 tabular">{product.stock} en stock</span>
+                                    <span className="text-[12px] text-ink-2 tabular">
+                                        {product.stock > 0 ? `${product.stock} en stock` : 'Sin stock'}
+                                        {qty >= product.stock && product.stock > 0 && <span className="text-py-red"> · máximo</span>}
+                                    </span>
                                 )}
                             </div>
                         )}
