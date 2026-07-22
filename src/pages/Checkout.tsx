@@ -9,11 +9,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
     Check, ChevronRight, ArrowLeft, ShoppingBag, MapPin, CreditCard,
     Minus, Plus, Trash2, User, Mail, Phone, IdCard, MessageCircle,
-    Truck, Store, Lock,
+    Truck, Store, Lock, Loader2,
 } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useStore } from '../store';
+import { createServerOrder } from '../lib/api';
 import { formatGs } from '../data/products';
 import { DEPARTAMENTOS, PAYMENT_METHODS } from '../data/paraguay';
 
@@ -30,6 +31,8 @@ export default function Checkout() {
     const s = useStore();
     const [step, setStep] = useState<StepId>('cart');
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [placing, setPlacing] = useState(false);
+    const [placeError, setPlaceError] = useState<string | null>(null);
 
     useEffect(() => { window.scrollTo({ top: 0 }); }, [step]);
 
@@ -72,9 +75,32 @@ export default function Checkout() {
         nav('/catalogo');
     };
 
-    const finalize = () => {
-        const order = s.createOrder();
-        nav(`/orden/${order.id}`);
+    const finalize = async () => {
+        if (placing) return;
+        setPlacing(true);
+        setPlaceError(null);
+        try {
+            // Preferir la orden validada por el servidor (precios/stock del
+            // catálogo canónico). Si el backend no está (preview local),
+            // caer al flujo client-side.
+            const server = await createServerOrder({
+                cart: s.cart,
+                customer: s.customer,
+                shipping: s.shipping,
+                payment: s.payment,
+            });
+            if (server) {
+                s.saveExternalOrder(server.order);
+                nav(`/orden/${server.order.id}`);
+                return;
+            }
+            const order = s.createOrder();
+            nav(`/orden/${order.id}`);
+        } catch (e) {
+            setPlaceError(e instanceof Error ? e.message : 'No pudimos confirmar el pedido. Probá de nuevo.');
+        } finally {
+            setPlacing(false);
+        }
     };
 
     if (empty && step === 'cart') {
@@ -115,11 +141,18 @@ export default function Checkout() {
                         </motion.div>
                     </AnimatePresence>
 
+                    {placeError && (
+                        <p role="alert" className="mt-6 text-[13px] font-semibold text-py-red bg-py-red/5 border border-py-red/20 px-4 py-3">
+                            {placeError}
+                        </p>
+                    )}
+
                     {/* Footer actions — desktop only (mobile uses sticky bottom bar below) */}
                     <div className="hidden lg:flex items-center justify-between mt-10 pt-8 border-t border-line">
                         <button
                             onClick={goBack}
-                            className="inline-flex items-center gap-2 text-[13px] font-semibold text-ink-2 hover:text-ink"
+                            disabled={placing}
+                            className="inline-flex items-center gap-2 text-[13px] font-semibold text-ink-2 hover:text-ink disabled:opacity-40"
                         >
                             <ArrowLeft className="h-4 w-4" />
                             {step === 'cart' ? 'Seguir comprando' : 'Volver'}
@@ -127,12 +160,14 @@ export default function Checkout() {
                         <button
                             onClick={goNext}
                             className="group inline-flex items-center gap-3 bg-ink text-paper rounded-none pl-6 pr-2 h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors disabled:opacity-40"
-                            disabled={empty && step === 'cart'}
+                            disabled={(empty && step === 'cart') || placing}
                             style={{ height: 52 }}
                         >
-                            {step === 'payment' ? 'Confirmar pedido' : 'Continuar'}
+                            {step === 'payment' ? (placing ? 'Confirmando…' : 'Confirmar pedido') : 'Continuar'}
                             <span className="flex items-center justify-center w-10 h-10 bg-paper text-ink">
-                                {step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
+                                {placing
+                                    ? <Loader2 className="h-4 w-4 animate-spin" />
+                                    : step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
                             </span>
                         </button>
                     </div>
@@ -160,11 +195,13 @@ export default function Checkout() {
                     </div>
                     <button
                         onClick={goNext}
-                        disabled={empty && step === 'cart'}
+                        disabled={(empty && step === 'cart') || placing}
                         className="group inline-flex items-center gap-2 bg-ink text-paper px-5 h-11 font-semibold text-[13px] hover:bg-ink/90 transition-colors disabled:opacity-40"
                     >
-                        {step === 'payment' ? 'Confirmar' : 'Continuar'}
-                        {step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
+                        {step === 'payment' ? (placing ? 'Confirmando…' : 'Confirmar') : 'Continuar'}
+                        {placing
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
                     </button>
                 </div>
             </div>

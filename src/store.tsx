@@ -73,6 +73,8 @@ interface StoreCtx {
     orders: Order[];
     lastOrder: Order | null;
     createOrder: () => Order;
+    /** Persiste una orden ya validada por el servidor y vacía el carrito. */
+    saveExternalOrder: (o: Order) => void;
     getOrder: (id: string) => Order | undefined;
 
     // Recently viewed
@@ -302,6 +304,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return o;
     }, [cart, customer, shipping, payment, writeCart]);
 
+    const saveExternalOrder = useCallback((o: Order) => {
+        setOrders((prev) => {
+            const next = [o, ...prev.filter((x) => x.id !== o.id)].slice(0, 20);
+            persist(ORDERS_KEY, next);
+            return next;
+        });
+        writeCart([]);
+    }, [writeCart]);
+
     const getOrder = useCallback((id: string) => orders.find((o) => o.id === id), [orders]);
 
     const cartCount = cart.reduce((a, b) => a + b.quantity, 0);
@@ -316,7 +327,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             user, isLoginOpen, openLogin: () => setLoginOpen(true), closeLogin: () => setLoginOpen(false),
             login, logout,
             customer, shipping, payment, setCustomer, setShipping, setPayment, resetCheckout,
-            orders, lastOrder, createOrder, getOrder,
+            orders, lastOrder, createOrder, saveExternalOrder, getOrder,
             recentIds, recordView,
         }}>
             {children}
