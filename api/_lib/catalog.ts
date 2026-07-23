@@ -23,9 +23,14 @@ export const clean = (s: unknown, n: number) =>
  * atacante puede falsificar para apuntar loadCatalog() a un products.json
  * propio con precios/stock arbitrarios (bypass del price-trust boundary +
  * SSRF). Host header solo como fallback para `vercel dev`/entornos locales.
+ *
+ * VERCEL_PROJECT_PRODUCTION_URL (el dominio de producción) va PRIMERO:
+ * VERCEL_URL apunta a la URL única del deployment, que en este proyecto
+ * queda detrás de Vercel Deployment Protection (redirige 302 a un login) y
+ * el fetch server-to-server nunca llega a products.json.
  */
 export function requestOrigin(req: any): string | null {
-  const trusted = process.env.VERCEL_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const trusted = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
   if (trusted) return `https://${trusted}`;
   const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
   const host = (req.headers['x-forwarded-host'] as string) || (req.headers.host as string);
