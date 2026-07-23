@@ -1,42 +1,17 @@
 /**
  * POST /api/orders — creación de orden VALIDADA EN SERVIDOR.
  *
- * Corrige el hallazgo del audit "client_trusted_prices": el cliente envía
- * SOLO ids y cantidades; el servidor busca los precios en el catálogo
- * canónico del deployment, recalcula el total, capea cantidades al stock
- * y devuelve la orden con una firma HMAC (si ORDER_SIGNING_SECRET está
- * configurado) para que el comercio pueda verificar que el resumen de
- * WhatsApp no fue adulterado.
+ * El cliente envía SOLO ids y cantidades; el servidor busca los precios en el
+ * catálogo canónico del deployment, recalcula el total, capea cantidades al
+ * stock y devuelve la orden con una firma HMAC opcional (ORDER_SIGNING_SECRET)
+ * para que el comercio pueda verificar el resumen de WhatsApp.
  *
- * Sin base de datos todavía: la orden no se persiste server-side (eso llega
- * con Supabase, fase 3 del roadmap). Pero los PRECIOS ya no son confiados
- * al cliente.
+ * Sin base de datos todavía: la orden no se persiste server-side (llega con
+ * la fase Supabase). Pero los PRECIOS ya no son confiados al cliente.
  */
 
 import crypto from 'node:crypto';
-
-interface InItem { id: string; qty: number }
-interface CatalogProduct {
-  id: string; name: string; brand: string; codigo?: string;
-  priceGs: number; stock?: number;
-}
-
-const clean = (s: unknown, n: number) =>
-  String(s ?? '').replace(/[\r\n<>]/g, '').slice(0, n);
-
-async function loadCatalog(origin: string): Promise<Map<string, CatalogProduct>> {
-  const urls = [`${origin}/products.json`, `${origin}/products-extra.json`];
-  const map = new Map<string, CatalogProduct>();
-  for (const url of urls) {
-    try {
-      const r = await fetch(url);
-      if (!r.ok) continue;
-      const arr = (await r.json()) as CatalogProduct[];
-      if (Array.isArray(arr)) for (const p of arr) map.set(p.id, p);
-    } catch { /* extra file may not exist */ }
-  }
-  return map;
-}
+import { clean, loadCatalog, requestOrigin, totalOf, validateItems } from './_lib/catalog';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -45,31 +20,20 @@ export default async function handler(req: any, res: any) {
   }
 
   const body = typeof req.body === 'string' ? safeParse(req.body) : req.body;
-  if (!body || !Array.isArray(body.items) || body.items.length === 0 || body.items.length > 50) {
-    return res.status(400).json({ error: 'items inválidos' });
-  }
+  if (!body) return res.status(400).json({ error: 'body inválido' });
 
-  const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
-  const host = (req.headers['x-forwarded-host'] as string) || (req.headers.host as string);
-  if (!host) return res.status(500).json({ error: 'host indeterminado' });
+  const origin = requestOrigin(req);
+  if (!origin) return res.status(500).json({ error: 'host indeterminado' });
 
-  const catalog = await loadCatalog(`${proto}://${host}`);
+  const catalog = await loadCatalog(origin);
   if (catalog.size === 0) return res.status(503).json({ error: 'catálogo no disponible' });
 
-  const items: { id: string; name: string; brand: string; codigo?: string; qty: number; priceGs: number }[] = [];
-  for (const raw of body.items as InItem[]) {
-    const id = clean(raw?.id, 64);
-    const p = catalog.get(id);
-    if (!p) return res.status(400).json({ error: `producto desconocido: ${id}` });
-    if (!(p.priceGs > 0)) return res.status(400).json({ error: `producto sin precio (consultar): ${id}` });
-    const wanted = Math.max(1, Math.min(99, Math.floor(Number(raw?.qty) || 1)));
-    const max = p.stock && p.stock > 0 ? p.stock : 99;
-    const qty = Math.min(wanted, max);
-    items.push({ id: p.id, name: p.name, brand: p.brand, codigo: p.codigo, qty, priceGs: p.priceGs });
-  }
+  const v = validateItems(catalog, body.items);
+  if ('error' in v) return res.status(400).json({ error: v.error });
+  const items = v.items;
 
   // Total calculado EXCLUSIVAMENTE con precios del catálogo del servidor.
-  const totalGs = items.reduce((a, it) => a + it.priceGs * it.qty, 0);
+  const totalGs = totalOf(items);
 
   const customer = {
     name: clean(body.customer?.name, 80),
@@ -94,8 +58,6 @@ export default async function handler(req: any, res: any) {
 
   const order = { id, createdAt: now.getTime(), items, totalGs, customer, shipping, payment, validated: true as const };
 
-  // Firma HMAC opcional: el comercio puede recomputarla para verificar
-  // que el pedido recibido por WhatsApp coincide con lo validado acá.
   let signature: string | null = null;
   const secret = process.env.ORDER_SIGNING_SECRET;
   if (secret) {

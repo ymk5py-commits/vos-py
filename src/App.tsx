@@ -12,6 +12,7 @@ import Contact from './pages/Contact';
 import AboutPage from './pages/AboutPage';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
+import PaymentReturn from './pages/PaymentReturn';
 import { Terms, Privacy, Cookies, Returns, Shipping, Warranty } from './pages/LegalPages';
 import { Link } from 'react-router-dom';
 
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/contacto" element={<Contact />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/orden/:id" element={<OrderConfirmation />} />
+        <Route path="/pago/retorno" element={<PaymentReturn />} />
         <Route path="/terminos" element={<Terms />} />
         <Route path="/privacidad" element={<Privacy />} />
         <Route path="/cookies" element={<Cookies />} />

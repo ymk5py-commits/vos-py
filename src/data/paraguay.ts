@@ -15,12 +15,25 @@ export const DEPARTAMENTOS = [
 export type Departamento = (typeof DEPARTAMENTOS)[number];
 
 export interface PaymentMethod {
-    id: 'transferencia' | 'billetera' | 'efectivo';
+    id: 'transferencia' | 'billetera' | 'efectivo' | 'bancard';
     name: string;
     short: string;
     description: string;
     details: string[];
 }
+
+/** Método online con tarjeta; visible solo cuando /api/config reporta bancard=true. */
+export const BANCARD_METHOD: PaymentMethod = {
+    id: 'bancard',
+    name: 'Tarjeta de crédito o débito',
+    short: 'Tarjeta (Bancard)',
+    description: 'Pagá online con tu tarjeta a través de Bancard vPOS, la pasarela de los bancos de Paraguay.',
+    details: [
+        'Visa, Mastercard y tarjetas de la red Bancard.',
+        'Pago inmediato y seguro (PCI, procesado por Bancard).',
+        'Sin recargo.',
+    ],
+};
 
 export const PAYMENT_METHODS: PaymentMethod[] = [
     {

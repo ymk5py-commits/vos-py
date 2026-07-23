@@ -229,7 +229,7 @@ export default function ProductPage() {
                                     </button>
                                     <span className="w-10 text-center font-semibold tabular text-[14px]">{qty}</span>
                                     <button
-                                        onClick={() => setQty((q) => Math.min(product.stock && product.stock > 0 ? product.stock : 99, q + 1))}
+                                        onClick={() => setQty((q) => Math.min(typeof product.stock === 'number' ? product.stock : 99, q + 1))}
                                         disabled={product.stock !== undefined && qty >= product.stock}
                                         className="h-10 w-10 flex items-center justify-center hover:bg-paper-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                         aria-label="Aumentar cantidad"
@@ -250,11 +250,12 @@ export default function ProductPage() {
                             {!askPrice && (
                                 <button
                                     onClick={() => addToCart(product, qty)}
-                                    className="group w-full inline-flex items-center justify-center gap-3 bg-ink text-paper h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors"
+                                    disabled={product.stock === 0}
+                                    className="group w-full inline-flex items-center justify-center gap-3 bg-ink text-paper h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                     style={{ height: 52 }}
                                 >
                                     <ShoppingCart className="h-4 w-4" strokeWidth={2} />
-                                    Agregar al carrito
+                                    {product.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
                                 </button>
                             )}
                             <a

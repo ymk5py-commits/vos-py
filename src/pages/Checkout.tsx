@@ -14,9 +14,10 @@ import {
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useStore } from '../store';
-import { createServerOrder } from '../lib/api';
+import { createServerOrder, createBancardPayment, fetchConfig, BancardPayment } from '../lib/api';
+import { savePendingBancardOrder } from '../lib/bancardPending';
 import { formatGs } from '../data/products';
-import { DEPARTAMENTOS, PAYMENT_METHODS } from '../data/paraguay';
+import { DEPARTAMENTOS, PAYMENT_METHODS, BANCARD_METHOD } from '../data/paraguay';
 
 type StepId = 'cart' | 'details' | 'shipping' | 'payment';
 const STEPS: { id: StepId; n: string; label: string; icon: any }[] = [
@@ -33,8 +34,17 @@ export default function Checkout() {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [placing, setPlacing] = useState(false);
     const [placeError, setPlaceError] = useState<string | null>(null);
+    const [bancardOn, setBancardOn] = useState(false);
+    const [bancardSession, setBancardSession] = useState<BancardPayment | null>(null);
 
     useEffect(() => { window.scrollTo({ top: 0 }); }, [step]);
+    useEffect(() => { fetchConfig().then((c) => setBancardOn(!!c?.payments.bancard)); }, []);
+    useEffect(() => { if (s.payment !== 'bancard') setBancardSession(null); }, [s.payment]);
+    // Si el usuario vuelve a un paso anterior (ej. a editar el carrito) y
+    // regresa a "pago", forzar una sesión nueva en vez de reusar una vieja
+    // con el monto ya desactualizado — evita cobrar un monto viejo y luego
+    // vaciar un carrito que cambió mientras tanto.
+    useEffect(() => { if (step !== 'payment') setBancardSession(null); }, [step]);
 
     const empty = s.cart.length === 0;
 
@@ -77,6 +87,25 @@ export default function Checkout() {
 
     const finalize = async () => {
         if (placing) return;
+
+        if (s.payment === 'bancard') {
+            // El pago con tarjeta se completa en el formulario embebido de
+            // Bancard, no acá. Si ya hay una sesión iniciada, no hacer nada.
+            if (bancardSession) return;
+            setPlacing(true);
+            setPlaceError(null);
+            try {
+                const payment = await createBancardPayment({ cart: s.cart });
+                savePendingBancardOrder(payment, s.cart, s.customer, s.shipping);
+                setBancardSession(payment);
+            } catch (e) {
+                setPlaceError(e instanceof Error ? e.message : 'No pudimos iniciar el pago con tarjeta.');
+            } finally {
+                setPlacing(false);
+            }
+            return;
+        }
+
         setPlacing(true);
         setPlaceError(null);
         try {
@@ -137,7 +166,7 @@ export default function Checkout() {
                             {step === 'cart' && <CartStep />}
                             {step === 'details' && <DetailsStep errors={errors} />}
                             {step === 'shipping' && <ShippingStep errors={errors} />}
-                            {step === 'payment' && <PaymentStep />}
+                            {step === 'payment' && <PaymentStep bancardOn={bancardOn} bancardSession={bancardSession} />}
                         </motion.div>
                     </AnimatePresence>
 
@@ -157,19 +186,25 @@ export default function Checkout() {
                             <ArrowLeft className="h-4 w-4" />
                             {step === 'cart' ? 'Seguir comprando' : 'Volver'}
                         </button>
-                        <button
-                            onClick={goNext}
-                            className="group inline-flex items-center gap-3 bg-ink text-paper rounded-none pl-6 pr-2 h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors disabled:opacity-40"
-                            disabled={(empty && step === 'cart') || placing}
-                            style={{ height: 52 }}
-                        >
-                            {step === 'payment' ? (placing ? 'Confirmando…' : 'Confirmar pedido') : 'Continuar'}
-                            <span className="flex items-center justify-center w-10 h-10 bg-paper text-ink">
-                                {placing
-                                    ? <Loader2 className="h-4 w-4 animate-spin" />
-                                    : step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
-                            </span>
-                        </button>
+                        {step === 'payment' && s.payment === 'bancard' && bancardSession ? (
+                            <p className="text-[13px] font-semibold text-ink-2">Completá el pago en el formulario de arriba.</p>
+                        ) : (
+                            <button
+                                onClick={goNext}
+                                className="group inline-flex items-center gap-3 bg-ink text-paper rounded-none pl-6 pr-2 h-13 font-semibold text-[14px] hover:bg-ink/90 transition-colors disabled:opacity-40"
+                                disabled={(empty && step === 'cart') || placing}
+                                style={{ height: 52 }}
+                            >
+                                {step === 'payment'
+                                    ? (placing ? 'Confirmando…' : s.payment === 'bancard' ? 'Continuar al pago' : 'Confirmar pedido')
+                                    : 'Continuar'}
+                                <span className="flex items-center justify-center w-10 h-10 bg-paper text-ink">
+                                    {placing
+                                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                                        : step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
+                                </span>
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -193,16 +228,22 @@ export default function Checkout() {
                         <p className="text-eyebrow text-ink-3 truncate">Total</p>
                         <p className="text-[15px] font-bold tabular text-ink truncate">{formatGsHelper(s.cartTotal)}</p>
                     </div>
-                    <button
-                        onClick={goNext}
-                        disabled={(empty && step === 'cart') || placing}
-                        className="group inline-flex items-center gap-2 bg-ink text-paper px-5 h-11 font-semibold text-[13px] hover:bg-ink/90 transition-colors disabled:opacity-40"
-                    >
-                        {step === 'payment' ? (placing ? 'Confirmando…' : 'Confirmar') : 'Continuar'}
-                        {placing
-                            ? <Loader2 className="h-4 w-4 animate-spin" />
-                            : step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
-                    </button>
+                    {step === 'payment' && s.payment === 'bancard' && bancardSession ? (
+                        <p className="flex-1 text-[12px] font-semibold text-ink-2 text-right">Completá arriba ↑</p>
+                    ) : (
+                        <button
+                            onClick={goNext}
+                            disabled={(empty && step === 'cart') || placing}
+                            className="group inline-flex items-center gap-2 bg-ink text-paper px-5 h-11 font-semibold text-[13px] hover:bg-ink/90 transition-colors disabled:opacity-40"
+                        >
+                            {step === 'payment'
+                                ? (placing ? 'Confirmando…' : s.payment === 'bancard' ? 'Continuar' : 'Confirmar')
+                                : 'Continuar'}
+                            {placing
+                                ? <Loader2 className="h-4 w-4 animate-spin" />
+                                : step === 'payment' ? <Check className="h-4 w-4" strokeWidth={2.5} /> : <ChevronRight className="h-4 w-4" />}
+                        </button>
+                    )}
                 </div>
             </div>
             {/* Spacer for sticky bar on mobile */}
@@ -428,16 +469,17 @@ const ShippingStep = ({ errors }: { errors: Record<string, string> }) => {
     );
 };
 
-const PaymentStep = () => {
+const PaymentStep = ({ bancardOn, bancardSession }: { bancardOn: boolean; bancardSession: BancardPayment | null }) => {
     const s = useStore();
-    const selected = PAYMENT_METHODS.find((p) => p.id === s.payment) ?? PAYMENT_METHODS[0];
+    const methods = bancardOn ? [...PAYMENT_METHODS, BANCARD_METHOD] : PAYMENT_METHODS;
+    const selected = methods.find((p) => p.id === s.payment) ?? methods[0];
     return (
         <div>
             <p className="text-eyebrow text-ink-3 mb-2">Paso 04</p>
             <h1 className="text-headline text-ink mb-8">¿Cómo querés pagar?</h1>
 
             <div className="grid gap-3">
-                {PAYMENT_METHODS.map((m) => (
+                {methods.map((m) => (
                     <button
                         key={m.id}
                         onClick={() => s.setPayment(m.id)}
@@ -471,6 +513,13 @@ const PaymentStep = () => {
                 </ul>
             </div>
 
+            {s.payment === 'bancard' && bancardSession && (
+                <div className="mt-8">
+                    <p className="text-eyebrow text-ink-3 mb-3">Pagá con tarjeta</p>
+                    <BancardEmbeddedForm processId={bancardSession.processId} environment={bancardSession.environment} />
+                </div>
+            )}
+
             <div className="mt-6 flex items-start gap-3 text-[12px] text-ink-3 leading-relaxed">
                 <Lock className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                 <p>
@@ -481,6 +530,52 @@ const PaymentStep = () => {
             </div>
         </div>
     );
+};
+
+/**
+ * Formulario embebido de Bancard vPOS (bancard-checkout-js). Carga el script
+ * oficial según el ambiente y monta el form dentro de un contenedor propio.
+ * Al completar/cancelar, Bancard redirige la página a return_url/cancel_url
+ * (/pago/retorno), definidos server-side en /api/bancard/create-payment.
+ */
+const BancardEmbeddedForm = ({ processId, environment }: { processId: string; environment: 'staging' | 'production' }) => {
+    useEffect(() => {
+        const src = environment === 'production'
+            ? 'https://vpos.infonet.com.py/checkout/javascript/dist/bancard-checkout-4.0.0.js'
+            : 'https://vpos.infonet.com.py:8888/checkout/javascript/dist/bancard-checkout-4.0.0.js';
+        let cancelled = false;
+
+        const mount = () => {
+            if (cancelled) return;
+            const w = window as any;
+            const container = document.getElementById('bancard-form-container');
+            if (container) container.innerHTML = '';
+            // Sin `new`: bancard-checkout-js expone createForm como función
+            // (no constructor) — invocarlo con `new` funciona hoy por
+            // casualidad de su implementación interna, pero no es el
+            // contrato documentado/soportado por Bancard.
+            if (w.Bancard?.Checkout) w.Bancard.Checkout.createForm('bancard-form-container', processId);
+        };
+
+        const existing = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
+        if (existing) {
+            if ((window as any).Bancard) mount();
+            else existing.addEventListener('load', mount);
+        } else {
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.onload = mount;
+            document.body.appendChild(script);
+        }
+
+        return () => {
+            cancelled = true;
+            existing?.removeEventListener('load', mount);
+        };
+    }, [processId, environment]);
+
+    return <div id="bancard-form-container" className="min-h-[420px] bg-paper-2 border border-line" />;
 };
 
 /* ---------------- Summary aside ---------------- */
