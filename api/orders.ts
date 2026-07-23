@@ -11,7 +11,7 @@
  */
 
 import crypto from 'node:crypto';
-import { clean, loadCatalog, requestOrigin, totalOf, validateItems } from './_lib/catalog';
+import { clean, loadCatalog, requestOrigin, totalOf, validateItems } from './_lib/catalog.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {

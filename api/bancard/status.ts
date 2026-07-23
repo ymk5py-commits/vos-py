@@ -17,7 +17,7 @@
  * fue aprobado antes de mostrar el éxito.
  */
 
-import { bancardEnv, md5, statusToken, tokensEqual } from '../_lib/bancard';
+import { bancardEnv, md5, statusToken, tokensEqual } from '../_lib/bancard.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {

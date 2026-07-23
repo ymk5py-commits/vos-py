@@ -10,8 +10,8 @@
  */
 
 import crypto from 'node:crypto';
-import { bancardEnv, md5, amountString, statusToken } from '../_lib/bancard';
-import { clean, loadCatalog, requestOrigin, totalOf, validateItems } from '../_lib/catalog';
+import { bancardEnv, md5, amountString, statusToken } from '../_lib/bancard.js';
+import { clean, loadCatalog, requestOrigin, totalOf, validateItems } from '../_lib/catalog.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {

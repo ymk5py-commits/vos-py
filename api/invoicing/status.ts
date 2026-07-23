@@ -7,7 +7,7 @@
  * Body: { cdc: string }
  */
 
-import { invoicingEnv, getInvoiceStatus, SifendeError } from '../_lib/invoicing';
+import { invoicingEnv, getInvoiceStatus, SifendeError } from '../_lib/invoicing.js';
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {

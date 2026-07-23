@@ -10,8 +10,8 @@
  * Sifende calcula IVA/subtotales desde los ítems — no se envía un total.
  */
 
-import { clean } from '../_lib/catalog';
-import { invoicingEnv, issueInvoice, SifendeError } from '../_lib/invoicing';
+import { clean } from '../_lib/catalog.js';
+import { invoicingEnv, issueInvoice, SifendeError } from '../_lib/invoicing.js';
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {

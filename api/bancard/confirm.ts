@@ -14,7 +14,7 @@
  * verifica el estado real vía get_confirmation (/api/bancard/status).
  */
 
-import { bancardEnv, md5, tokensEqual } from '../_lib/bancard';
+import { bancardEnv, md5, tokensEqual } from '../_lib/bancard.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {

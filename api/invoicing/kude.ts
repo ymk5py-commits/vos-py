@@ -5,7 +5,7 @@
  * desde el navegador del cliente sin exponer la key).
  */
 
-import { invoicingEnv, fetchKude, SifendeError } from '../_lib/invoicing';
+import { invoicingEnv, fetchKude, SifendeError } from '../_lib/invoicing.js';
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'GET') {
